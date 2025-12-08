@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 06, 2025 at 10:36 AM
+-- Generation Time: Dec 08, 2025 at 03:01 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -55,7 +55,7 @@ CREATE TABLE `borrowers` (
 INSERT INTO `borrowers` (`borrower_id`, `borrower_name`, `position`, `borrower_type`) VALUES
 (1, 'John Dela Cruz', 'BSIT3', 'Student'),
 (2, 'Mary Ann', 'Teacher I', 'Teacher'),
-(3, 'James Tan', 'Technician', 'Staff');
+(3, 'James Tann', 'Technician', 'Staff');
 
 -- --------------------------------------------------------
 
@@ -129,7 +129,8 @@ INSERT INTO `incharge` (`incharge_id`, `incharge_name`, `position`, `contact_inf
 (2, 'Anna Lopez', 'Furniture Manager', '09221234567', 2),
 (3, 'Carlos Reyes', 'Gym Attendant', '09331234567', 3),
 (4, 'Lisa Ramos', 'Inventory Clerk', '09441234567', 4),
-(5, 'Ben Castillo', 'Workshop Lead', '09551234567', 5);
+(5, 'Ben Castillo', 'Workshop Lead', '09551234567', 5),
+(6, 'Juan trh', 'Faculty', '99755755755', 1);
 
 -- --------------------------------------------------------
 
@@ -156,7 +157,7 @@ CREATE TABLE `items` (
 --
 
 INSERT INTO `items` (`item_id`, `item_name`, `barcode`, `category_id`, `unit`, `date_acquired`, `last_scanned`, `storage_location`, `incharge_id`, `added_by`, `status`) VALUES
-(1, 'Laptop Dell Inspiron', 'ELEC001', 1, 'pcs', '2025-01-10', '2025-10-10 09:30:00', 'Room 101', 1, 'admin', 'Available'),
+(1, 'Laptop Dell Inspiron', 'ELEC001', 1, 'pcs', '2025-01-10', '2025-10-10 09:30:00', 'Room 101', 1, 'admin', 'Borrowed'),
 (2, 'Smart TV Samsung', 'ELEC002', 1, 'pcs', '2025-02-15', '2025-08-25 10:00:00', 'AV Room', 1, 'admin', 'Available'),
 (3, 'Office Table', 'FUR001', 2, 'pcs', '2025-03-20', '2025-09-05 14:00:00', 'Room 201', 2, 'admin', 'Available'),
 (4, 'Whiteboard', 'FUR002', 2, 'pcs', '2025-04-02', NULL, 'Room 202', 2, 'staff1', 'Available'),
@@ -203,15 +204,20 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `firstName` varchar(100) DEFAULT NULL,
+  `lastName` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `created_at`) VALUES
-(1, 'administrator', 'Admin_123', '2025-10-01 13:01:49');
+INSERT INTO `users` (`id`, `username`, `password`, `created_at`, `firstName`, `lastName`) VALUES
+(1, 'administrator', 'Admin_123', '2025-10-01 13:01:49', NULL, NULL),
+(2, 'admin', 'admin', '2025-12-06 19:50:35', 'Jerahmeel', 'Mitchao'),
+(4, 'admin1', 'admin', '2025-12-08 12:18:03', 'Juan', 'Dela Cruz'),
+(5, 'qwerty', '123', '2025-12-08 13:43:19', 'qwerty', 'asdfg');
 
 --
 -- Indexes for dumped tables
@@ -307,7 +313,7 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `incharge`
 --
 ALTER TABLE `incharge`
-  MODIFY `incharge_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `incharge_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `items`
@@ -325,7 +331,7 @@ ALTER TABLE `scan_log`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
