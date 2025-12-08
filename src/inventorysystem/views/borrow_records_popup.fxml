@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="inventorysystem.controllers.BorrowRecordsPopupController"
+            prefWidth="600" prefHeight="300">
+
+    <TableView fx:id="recordsTable" layoutX="10" layoutY="10"
+               prefWidth="580" prefHeight="280">
+
+        <columns>
+            <TableColumn fx:id="colBorrower" text="Borrower" prefWidth="150"/>
+            <TableColumn fx:id="colBorrowDate" text="Borrow Date" prefWidth="150"/>
+            <TableColumn fx:id="colReturnDate" text="Return Date" prefWidth="150"/>
+            <TableColumn fx:id="colStatus" text="Status" prefWidth="120"/>
+        </columns>
+    </TableView>
+
+</AnchorPane>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="inventorysystem.controllers.BorrowItemPopupController"
+      spacing="12"
+      style="-fx-padding: 15;">
+    
+    <Label text="Select Borrower:" style="-fx-font-size: 16px;"/>
+
+    
+
+    <ComboBox fx:id="borrowerDropdown" prefWidth="280"/>
+
+    <HBox spacing="10">
+        <Button text="Borrow"
+                onAction="#borrowItem"
+                style="-fx-background-color: #27ae60; -fx-text-fill: white;"/>
+
+        <Button text="Add Borrower"
+                onAction="#addBorrower"
+                style="-fx-background-color: #e67e22; -fx-text-fill: white;"/>
+    </HBox>
+
+</VBox>
+

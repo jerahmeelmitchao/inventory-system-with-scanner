@@ -1,5 +1,7 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.ItemDAO;
+import inventorysystem.models.Item;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -10,10 +12,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class DashboardController {
@@ -49,8 +53,8 @@ public class DashboardController {
         buttonFxmlMap.put(borrowersBtn, "BorrowerManagement.fxml");
         buttonFxmlMap.put(inchargesBtn, "InCharge.fxml");
         buttonFxmlMap.put(scannedItemsBtn, "scanned_items.fxml"); //
-//        buttonFxmlMap.put(ReportsBtn, "reports.fxml");
 
+//        buttonFxmlMap.put(ReportsBtn, "reports.fxml");
         // Add click events
         buttonFxmlMap.keySet().forEach(btn -> btn.setOnAction(e -> loadView(btn)));
         // ✔ Add logout action
@@ -58,30 +62,93 @@ public class DashboardController {
 
         // Load default view
         loadView(dashboardBtn);
+        Platform.runLater(() -> {
+            mainContent.requestFocus();
+            setupBarcodeScanner();
+        });
+
     }
 
     private void loadView(Button clickedButton) {
-        // Highlight the active button
+
         buttonFxmlMap.keySet().forEach(btn
                 -> btn.setStyle(btn == clickedButton
-                        ? "-fx-background-color: #2980b9;" : "-fx-background-color: #34495e;")
+                        ? "-fx-background-color: #2980b9;"
+                        : "-fx-background-color: #34495e;")
         );
 
-        // Load corresponding FXML
         String fxmlFile = buttonFxmlMap.get(clickedButton);
-        URL fxmlUrl = getClass().getResource("/inventorysystem/views/" + fxmlFile);
 
-        if (fxmlUrl == null) {
-            System.err.println("❌ FXML file not found: " + fxmlFile);
+        try {
+            Node view = FXMLLoader.load(getClass().getResource("/inventorysystem/views/" + fxmlFile));
+            mainContent.getChildren().clear();
+            mainContent.getChildren().add(view);
+
+            // 🔥 After loading new view, force focus back so scanner works
+            Platform.runLater(() -> mainContent.requestFocus());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private StringBuilder barcodeBuffer = new StringBuilder();
+
+    private void setupBarcodeScanner() {
+
+        Scene scene = mainContent.getScene();
+        if (scene == null) {
+            System.out.println("Scene not ready — scanner not connected yet.");
             return;
         }
 
+        scene.setOnKeyPressed(event -> {
+
+            String ch = event.getText();
+
+            if (ch.matches("[A-Za-z0-9]")) {
+                barcodeBuffer.append(ch);
+            }
+
+            if (event.getCode().toString().equals("ENTER")) {
+                String scannedCode = barcodeBuffer.toString();
+                barcodeBuffer.setLength(0);
+                handleScannedBarcode(scannedCode);
+            }
+        });
+
+        System.out.println("✔ Barcode scanner successfully connected.");
+    }
+
+    private void handleScannedBarcode(String barcode) {
+        ItemDAO dao = new ItemDAO();
+        Item item = dao.getItemByBarcode(barcode);
+
+        if (item != null) {
+            showScanPopup(item);
+        } else {
+            System.out.println("Item not found. Barcode: " + barcode);
+        }
+    }
+
+    private void showScanPopup(Item item) {
         try {
-            Node view = FXMLLoader.load(fxmlUrl);
-            mainContent.getChildren().clear();
-            mainContent.getChildren().add(view);
-        } catch (IOException e) {
-            System.err.println("❌ Failed to load view: " + fxmlFile);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/inventorysystem/views/scan_result.fxml"));
+            Parent root = loader.load();
+
+            ScanResultController controller = loader.getController();
+            controller.setItem(item);
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Item Details");
+
+            stage.setAlwaysOnTop(true);
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            stage.show();
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
