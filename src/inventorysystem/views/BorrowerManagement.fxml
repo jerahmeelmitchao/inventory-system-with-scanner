@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="inventorysystem.controllers.BorrowerController"
+      spacing="12">
+
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <!-- 🔍 SEARCH + FILTER BAR -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+
+        <TextField fx:id="searchField"
+                   promptText="Search borrower..."
+                   HBox.hgrow="ALWAYS"/>
+
+        <ComboBox fx:id="filterTypeCombo"
+                  promptText="Filter Type"
+                  prefWidth="140"/>
+
+        <ComboBox fx:id="filterPositionCombo"
+                  promptText="Filter Position"
+                  prefWidth="160"/>
+
+        <Button fx:id="clearFilterButton"
+                text="Clear Filters"
+                onAction="#handleClearFilters"
+                style="-fx-background-color: #d9534f; -fx-text-fill: white;"/>
+    </HBox>
+    <!-- ACTION BUTTONS -->
+    <HBox spacing="10">
+        <Button fx:id="addButton" text="Add" onAction="#handleAdd"/>
+        <Button fx:id="updateButton" text="Update" onAction="#handleUpdate" disable="true"/>
+        <Button fx:id="deleteButton" text="Delete" onAction="#handleDelete" disable="true"/>
+        <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel" visible="false"/>
+    </HBox>
+
+    <!-- TABLE -->
+    <TableView fx:id="borrowerTable" prefHeight="350">
+        <columns>
+            <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+            <TableColumn fx:id="colName" text="Name" prefWidth="150"/>
+            <TableColumn fx:id="colPosition" text="Position" prefWidth="150"/>
+            <TableColumn fx:id="colType" text="Type" prefWidth="100"/>
+            <TableColumn fx:id="colActions" text="Actions" prefWidth="200"/>
+        </columns>
+    </TableView>
+
+</VBox>

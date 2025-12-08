@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="inventorysystem.controllers.AddItemController"
+            style="-fx-background-color: white; -fx-padding: 20;">
+    
+    <ScrollPane fitToWidth="true" fitToHeight="true">
+        <content>
+            <VBox spacing="15">
+                <GridPane hgap="10" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" minWidth="150"/>
+                        <ColumnConstraints halignment="LEFT" minWidth="250"/>
+                    </columnConstraints>
+
+                    <!-- BASIC INFO -->
+                    <Label text="Item Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <TextField fx:id="itemNameField" promptText="Enter item name" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                    <Label text="Barcode:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextField fx:id="barcodeField" promptText="Enter unique barcode" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                    <Label text="Category:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="categoryComboBox" promptText="Select category" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                    <Label text="Unit:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <TextField fx:id="unitField" promptText="e.g. pcs, sets" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                    <!-- NEW STATUS FIELD -->
+                    <Label text="Status:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="statusComboBox" 
+                              promptText="Available, Damaged, Borrowed, Missing, Disposed"
+                              GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                    <!-- ADDITIONAL INFO -->
+                    <Label text="Date Acquired:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                    <DatePicker fx:id="dateAcquiredPicker" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                    <Label text="Storage Location:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                    <TextField fx:id="locationField" promptText="e.g. Room 101, Storage Room" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+                    <Label text="In-Charge:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="inChargeComboBox" promptText="Select person in charge" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+
+                    <Label text="Added By:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
+                    <TextField fx:id="addedByField" promptText="Enter username" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+                </GridPane>
+
+                <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Button text="Cancel" onAction="#handleCancel" styleClass="cancel-btn"/>
+                    <Button text="Save Item" onAction="#handleSave" styleClass="primary-btn"/>
+                </HBox>
+            </VBox>
+        </content>
+    </ScrollPane>
+</AnchorPane>

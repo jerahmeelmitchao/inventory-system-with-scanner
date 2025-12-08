@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="500" prefWidth="800"
+            fx:id="rootPane"
+            xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="inventorysystem.controllers.SignUpController"
+            styleClass="login-root">
+
+    <children>
+
+        <HBox prefWidth="800" prefHeight="500">
+
+            <!-- LEFT SIDE -->
+            <AnchorPane styleClass="login-image-panel" prefWidth="400">
+                <children>
+                    <ImageView fitWidth="400" fitHeight="500" preserveRatio="false">
+                        <image>
+                            <Image url="@/inventorysystem/assets/inventory.png"/>
+                        </image>
+                    </ImageView>
+                </children>
+            </AnchorPane>
+
+            <!-- RIGHT SIDE -->
+            <StackPane alignment="CENTER" prefWidth="400">
+                <children>
+                    <VBox alignment="CENTER" spacing="15" styleClass="login-form">
+
+                        <Text text="Create an Account" styleClass="login-title"/>
+
+                        <TextField fx:id="signInUsername" promptText="Username" styleClass="login-field"/>
+                        <TextField fx:id="signInFirstName" promptText="First Name" styleClass="login-field"/>
+                        <TextField fx:id="signInLastName" promptText="Last Name" styleClass="login-field"/>
+
+                        <PasswordField fx:id="signInPassword" promptText="Password" styleClass="login-field"/>
+                        <PasswordField fx:id="signInConfirmPassword" promptText="Confirm Password" styleClass="login-field"/>
+
+                        <Button fx:id="signUpBtn" text="Sign Up" onAction="#handleSignUp"
+                                styleClass="login-btn"/>
+
+                        <HBox alignment="CENTER" spacing="5">
+                            <Text text="Already have an account?" />
+                            <Text text="Log In" onMouseClicked="#switchToLoginPage"
+                                  styleClass="login-link"/>
+                        </HBox>
+
+                    </VBox>
+                </children>
+            </StackPane>
+
+        </HBox>
+
+    </children>
+
+</AnchorPane>
