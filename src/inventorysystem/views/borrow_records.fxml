@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="inventorysystem.controllers.BorrowRecordsController"
+            style="-fx-background-color: #f4f6f7;"
+            prefWidth="900" prefHeight="600">
+
+    <!-- Top: Filters -->
+    <top>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <Label text="Borrow Records"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+
+            <HBox spacing="10">
+                <TextField fx:id="searchField"
+                           promptText="Search by item, borrower, status, remarks..."
+                           HBox.hgrow="ALWAYS"/>
+
+                <ComboBox fx:id="statusFilterCombo" prefWidth="160"/>
+
+                <Button fx:id="clearFilterBtn" text="Clear Filters"
+                        style="-fx-background-radius: 5; -fx-background-color: #bdc3c7; -fx-text-fill: #2c3e50;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Center: Table -->
+    <center>
+        <TableView fx:id="borrowTable" prefHeight="400" BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="colRecordId" text="Record ID" prefWidth="80"/>
+                <TableColumn fx:id="colItemName" text="Item" prefWidth="180"/>
+                <TableColumn fx:id="colBorrowerName" text="Borrower" prefWidth="180"/>
+                <TableColumn fx:id="colBorrowDate" text="Borrow Date" prefWidth="180"/>
+                <TableColumn fx:id="colReturnDate" text="Return Date" prefWidth="180"/>
+                <TableColumn fx:id="colStatus" text="Status" prefWidth="120"/>
+                <TableColumn fx:id="colRemarks" text="Remarks" prefWidth="200"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <!-- Bottom: Pagination + Actions -->
+    <bottom>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button fx:id="prevPageBtn" text="Previous"/>
+                <Label fx:id="pageInfoLabel" text="Page 1 of 1"/>
+                <Button fx:id="nextPageBtn" text="Next"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Label text="Rows per page:"/>
+                <ComboBox fx:id="rowsPerPageCombo" prefWidth="80"/>
+            </HBox>
+
+            <HBox alignment="CENTER_RIGHT">
+                <Button fx:id="viewDetailsBtn" text="View Details"
+                        style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-background-radius: 5;"/>
+            </HBox>
+        </VBox>
+    </bottom>
+
+</BorderPane>

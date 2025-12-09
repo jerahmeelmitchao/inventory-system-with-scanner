@@ -10,11 +10,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import javafx.animation.FadeTransition;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -286,9 +284,16 @@ public class BorrowerController {
                     itemDAO.updateItemStatus(item.getItemId(), "Borrowed");
 
                     BorrowRecord record = new BorrowRecord(
-                            0, item.getItemId(), borrower.getBorrowerId(),
-                            LocalDate.now(), null, "Borrowed"
+                            0,
+                            item.getItemId(),
+                            borrower.getBorrowerId(),
+                            LocalDateTime.now(),
+                            null,
+                            "Borrowed",
+                            ""
                     );
+                    borrowRecordDAO.addBorrowRecord(record);
+
                     borrowRecordDAO.addBorrowRecord(record);
 
                     showAlert("Success", "Item borrowed successfully!");
@@ -333,7 +338,7 @@ public class BorrowerController {
                 BorrowRecord rec = listView.getSelectionModel().getSelectedItem();
                 if (rec != null) {
 
-                    borrowRecordDAO.returnBorrowRecord(rec.getRecordId(), LocalDate.now(), remarks.getText());
+                    borrowRecordDAO.returnBorrowRecord(rec.getRecordId(), LocalDateTime.now(), remarks.getText());
 
                     String newStatus = remarks.getText().toLowerCase().contains("damaged")
                             ? "Damaged" : "Available";
