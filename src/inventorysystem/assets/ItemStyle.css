@@ -2,14 +2,14 @@
 .root-bg {
     -fx-background-color: #f0f2f5;
 
-    -fx-min-width: 680;
-    -fx-min-height: 900;
+/*    -fx-min-width: 680;
+    -fx-min-height: 900;*/
 
-    -fx-pref-width: 680;
-    -fx-pref-height: 900;
+/*    -fx-pref-width: 600;
+    -fx-pref-height: 700;*/
 
     -fx-max-width: 1200;
-    -fx-max-height: 900;
+    -fx-max-height: 910;
 }
 
 /* ScrollPane transparent */

@@ -15,14 +15,14 @@
         <content>
             <VBox spacing="30" alignment="TOP_CENTER">
                 <padding>
-                    <Insets top="40" right="40" bottom="40" left="40"/>
+                    <Insets top="5" right="5" bottom="5" left="5"/>
                 </padding>
 
-                <VBox spacing="25" maxWidth="600" styleClass="card">
+                <VBox spacing="20" maxWidth="600" styleClass="card">
 
                     <Label text="Update Item" styleClass="title"/>
 
-                    <VBox spacing="18">
+                    <VBox spacing="15">
 
                         <TextField fx:id="itemNameField"
                                    promptText="Item name"
