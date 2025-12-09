@@ -23,11 +23,8 @@
             </padding>
 
             <!-- Title -->
-            <Label styleClass="title-label" text="Categories">
-                <font>
-                    <Font name="System Bold" size="24.0"/>
-                </font>
-            </Label>
+            <Label text="Categories"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
 
             <!-- Input Grid -->
             <GridPane hgap="15.0" vgap="12.0">

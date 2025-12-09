@@ -1,5 +1,6 @@
 package inventorysystem;
 
+import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -24,7 +25,6 @@ public class Main extends Application {
 //            Scene scene = new Scene(root, 1200, 750);
             
             // Scene size for login 
-//            Scene scene = new Scene(root, 700, 500);
             Scene scene = new Scene(root, 800, 500);
             scene.getStylesheets().add(getClass().getResource("/inventorysystem/assets/styles.css").toExternalForm());
 
@@ -41,7 +41,7 @@ public class Main extends Application {
 
             primaryStage.show();
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

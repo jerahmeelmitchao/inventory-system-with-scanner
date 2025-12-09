@@ -1,36 +1,46 @@
 package inventorysystem.models;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Item {
 
     private int itemId;
     private String itemName;
-    private String barcode;
+
+    // DB column: item_code
+    private String itemCode;
+
     private int categoryId;
     private String unit;
     private LocalDate dateAcquired;
+
     private String status;
     private String storageLocation;
+
     private int inchargeId;
+
+    // Joined fields (optional)
     private String inChargeName;
     private String categoryName;
+
     private String addedBy;
-    private LocalDate lastScanned;
+
+    // DB is DATETIME → LocalDateTime required
+    private LocalDateTime lastScanned;
+
     private String description;
 
-    // ✅ FIX: Remove unsupported operation – REQUIRED by ItemDAO
-    public Item() {
-        // Empty constructor for DAO use
-    }
+    // Required empty constructor
+    public Item() {}
 
-    public Item(int itemId, String itemName, String barcode, int categoryId,
+    public Item(int itemId, String itemName, String itemCode, int categoryId,
                 String unit, LocalDate dateAcquired, String status,
                 String storageLocation, int inchargeId, String addedBy) {
 
         this.itemId = itemId;
         this.itemName = itemName;
-        this.barcode = barcode;
+        this.itemCode = itemCode;
         this.categoryId = categoryId;
         this.unit = unit;
         this.dateAcquired = dateAcquired;
@@ -41,11 +51,8 @@ public class Item {
     }
 
     // -------------------------------
-    // Getters & Setters
+    // Getters / Setters
     // -------------------------------
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
 
     public int getItemId() { return itemId; }
     public void setItemId(int itemId) { this.itemId = itemId; }
@@ -53,8 +60,9 @@ public class Item {
     public String getItemName() { return itemName; }
     public void setItemName(String itemName) { this.itemName = itemName; }
 
-    public String getBarcode() { return barcode; }
-    public void setBarcode(String barcode) { this.barcode = barcode; }
+    public String getItemCode() { return itemCode; }        // FIXED
+    public void setItemCode(String itemCode) { this.itemCode = itemCode; }
+    public String getBarcode() { return itemCode; }     
 
     public int getCategoryId() { return categoryId; }
     public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
@@ -83,7 +91,9 @@ public class Item {
     public String getAddedBy() { return addedBy; }
     public void setAddedBy(String addedBy) { this.addedBy = addedBy; }
 
-    public LocalDate getLastScanned() { return lastScanned; }
-    public void setLastScanned(LocalDate lastScanned) { this.lastScanned = lastScanned; }
+    public LocalDateTime getLastScanned() { return lastScanned; }    // FIXED for DATETIME
+    public void setLastScanned(LocalDateTime lastScanned) { this.lastScanned = lastScanned; }
 
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 }

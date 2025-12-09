@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,13 +31,10 @@ import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 import java.io.FileOutputStream;
 import java.util.Optional;
-import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import inventorysystem.utils.BarcodeGenerator;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import javafx.embed.swing.SwingFXUtils;
 import org.krysalis.barcode4j.impl.code128.Code128Bean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 
@@ -108,7 +106,7 @@ public class ItemController {
         });
 
         colLastScanned.setCellValueFactory(cd -> {
-            LocalDate date = cd.getValue().getLastScanned();
+            LocalDateTime date = cd.getValue().getLastScanned();
             String formatted = date != null ? date.format(displayFormatter) : "—";
             return new SimpleStringProperty(formatted);
         });
@@ -1232,23 +1230,4 @@ public class ItemController {
             }
         });
     }
-
-//    private void loadLoggedUserInfo() {
-//        try {
-//            Class<?> daoClass = Class.forName("inventorysystem.dao.UserDAO");
-//            Object dao = daoClass.getDeclaredConstructor().newInstance();
-//
-//            // Your DB lookup: getUserByUsername(username)
-//            Object user = daoClass.getMethod("getUserByUsername", String.class)
-//                    .invoke(dao, loggedUsername);
-//
-//            if (user != null) {
-//                loggedFirstName = (String) user.getClass().getMethod("getFirstName").invoke(user);
-//                loggedLastName = (String) user.getClass().getMethod("getLastName").invoke(user);
-//            }
-//
-//        } catch (Exception e) {
-//            System.out.println("⚠ Could not load user info, using defaults.");
-//        }
-//    }
 }
