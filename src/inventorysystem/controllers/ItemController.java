@@ -52,6 +52,18 @@ public class ItemController {
     private ComboBox<String> filterCategoryComboBox, filterStatusComboBox;
     @FXML
     private Button addButton, updateButton, deleteButton, clearFilterButton;
+    @FXML
+    private Button btnPrev, btnNext;
+    @FXML
+    private Label lblPageInfo;
+    @FXML
+    private ComboBox<Integer> rowsPerPageCombo;
+    @FXML
+    private Button viewDetailsButton;
+
+    private int currentPage = 1;
+    private int rowsPerPage = 10;
+    private ObservableList<Item> currentPageData = FXCollections.observableArrayList();
 
     private final ItemDAO itemDAO = new ItemDAO();
     private final CategoryDAO categoryDAO = new CategoryDAO();
@@ -65,11 +77,22 @@ public class ItemController {
 
     private static String loggedFirstName = "";
     private static String loggedLastName = "";
+    private static int loggedUserId;
 
-// Call these from LoginController after login
-    public static void setLoggedUserNames(String first, String last) {
+    // Call these from LoginController after login
+    public static void setLoggedUser(int id, String username, String first, String last) {
+        loggedUserId = id;
+        loggedUsername = username;
         loggedFirstName = first;
         loggedLastName = last;
+    }
+
+    public static int getLoggedUserId() {
+        return loggedUserId;
+    }
+
+    public static String getLoggedUsername() {
+        return loggedUsername;
     }
 
     public static String getLoggedFullName() {
@@ -84,8 +107,7 @@ public class ItemController {
         loadCategories();
         loadItems();
         setupFiltering();
-//        loadLoggedUserInfo();
-
+        setupPagination();
     }
 
     private void setupTableColumns() {
@@ -137,12 +159,18 @@ public class ItemController {
 
             Stage stage = new Stage();
             stage.setTitle("Add New Item");
-            stage.setScene(new Scene(root));
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(
+                    getClass().getResource("/inventorysystem/assets/itemStyle.css").toExternalForm()
+            );
+            stage.setScene(scene);
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
 
-            loadItems();
+            loadItems(); // refresh list after closing
+
         } catch (IOException e) {
+            e.printStackTrace();
             showAlert("Error", "Failed to open Add Item form.", e.getMessage());
         }
     }
@@ -161,28 +189,22 @@ public class ItemController {
             Parent root = loader.load();
 
             UpdateItemController controller = loader.getController();
-
-            controller.setItemData(
-                    selected.getItemId(),
-                    selected.getItemName(),
-                    selected.getBarcode(),
-                    selected.getCategoryName(),
-                    selected.getUnit(),
-                    selected.getDateAcquired(),
-                    selected.getStatus(), // NEW
-                    selected.getStorageLocation(),
-                    selected.getInChargeName(),
-                    selected.getAddedBy()
-            );
+            controller.loadItem(selected.getItemId()); // ✔ load full item from DB
 
             Stage stage = new Stage();
             stage.setTitle("Update Item");
-            stage.setScene(new Scene(root));
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(
+                    getClass().getResource("/inventorysystem/assets/itemStyle.css").toExternalForm()
+            );
+            stage.setScene(scene);
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
 
-            loadItems();
-        } catch (Exception e) {
+            loadItems(); // refresh table
+
+        } catch (IOException e) {
+            e.printStackTrace();
             showAlert("Error", "Failed to open Update Item form.", e.getMessage());
         }
     }
@@ -253,6 +275,7 @@ public class ItemController {
 
             return matchesSearch && matchesCategory && matchesStatus;
         });
+        updatePage();
     }
 
     @FXML
@@ -417,7 +440,6 @@ public class ItemController {
     private void exportFormat(String reportType, String format) {
 
         // Always load latest user info
-//        loadLoggedUserInfo();
         switch (reportType) {
 
             case "all" -> {
@@ -669,14 +691,6 @@ public class ItemController {
                 doc.add(sign);
             } catch (Exception ignored) {
             }
-
-//            Paragraph sig = new Paragraph(
-//                    "_____________________________\n"
-//                    + getLoggedFullName() + "\nInventory Officer",
-//                    new Font(Font.HELVETICA, 11)
-//            );
-//            sig.setAlignment(Element.ALIGN_RIGHT);
-//            doc.add(sig);
         } catch (Exception e) {
             // swallow — signature is non-critical
         }
@@ -1203,9 +1217,9 @@ public class ItemController {
     }
 
     // ---------------------------
-// Replace your handleExportBarcode()
-// with this Stage-based popup
-// ---------------------------
+    // Replace your handleExportBarcode()
+    // with this Stage-based popup
+    // ---------------------------
     @FXML
     private void handleExportBarcode() {
         showExportBarcodePopup();
@@ -1313,4 +1327,90 @@ public class ItemController {
         popup.show();
     }
 
+    private void setupPagination() {
+        rowsPerPageCombo.setItems(FXCollections.observableArrayList(5, 10, 20, 30, 50));
+        rowsPerPageCombo.setValue(10);
+
+        rowsPerPageCombo.valueProperty().addListener((obs, old, newVal) -> {
+            rowsPerPage = newVal;
+            currentPage = 1;
+            updatePage();
+        });
+
+        btnPrev.setOnAction(e -> {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePage();
+            }
+        });
+
+        btnNext.setOnAction(e -> {
+            if (currentPage < getTotalPages()) {
+                currentPage++;
+                updatePage();
+            }
+        });
+
+        updatePage();
+    }
+
+    private void updatePage() {
+        ObservableList<Item> list = filteredData; // always use filtered list
+
+        int total = list.size();
+        int totalPages = getTotalPages();
+        if (totalPages == 0) {
+            totalPages = 1;
+        }
+
+        int from = (currentPage - 1) * rowsPerPage;
+        int to = Math.min(from + rowsPerPage, total);
+
+        if (from > to) {
+            currentPage = 1;
+            from = 0;
+            to = Math.min(rowsPerPage, total);
+        }
+
+        currentPageData.setAll(list.subList(from, to));
+        itemTable.setItems(currentPageData);
+
+        lblPageInfo.setText("Page " + currentPage + " of " + totalPages);
+
+        btnPrev.setDisable(currentPage == 1);
+        btnNext.setDisable(currentPage == totalPages);
+    }
+
+    private int getTotalPages() {
+        int total = filteredData.size();
+        return (int) Math.ceil((double) total / rowsPerPage);
+    }
+
+    @FXML
+    private void handleViewDetails() {
+        Item selected = itemTable.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            showAlert("Warning", "No Selection", "Please select an item to view.");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/inventorysystem/views/item_details.fxml"));
+            Parent root = loader.load();
+
+            ItemDetailsController controller = loader.getController();
+            controller.loadItem(selected.getItemId());
+
+            Stage stage = new Stage();
+            stage.setTitle("Item Details");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to open item details.", e.getMessage());
+        }
+    }
 }

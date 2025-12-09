@@ -37,7 +37,6 @@ public class ScannedItemsController {
     public void initialize() {
 
         colItemName.setCellValueFactory(data -> data.getValue().itemNameProperty());
-
         colScanDate.setCellValueFactory(data -> {
             String raw = data.getValue().getScanDate();
             String formatted = raw;
@@ -86,6 +85,7 @@ public class ScannedItemsController {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 scannedList.add(new ScannedItem(
+                        rs.getInt("item_id"),
                         rs.getString("item_name"),
                         rs.getString("scan_date")
                 ));
@@ -112,7 +112,7 @@ public class ScannedItemsController {
             Parent root = loader.load();
 
             ItemDetailsController controller = loader.getController();
-            controller.loadItem(selected.getItemName());
+            controller.loadItem(selected.getItemId());
 
             Stage stage = new Stage();
             stage.setTitle("Item Details");
@@ -129,28 +129,36 @@ public class ScannedItemsController {
     // Data model for the table
     public static class ScannedItem {
 
+        private final int itemId;
         private final SimpleStringProperty itemName;
         private final SimpleStringProperty scanDate;
 
-        public ScannedItem(String itemName, String scanDate) {
+        public ScannedItem(int itemId, String itemName, String scanDate) {
+            this.itemId = itemId;
             this.itemName = new SimpleStringProperty(itemName);
             this.scanDate = new SimpleStringProperty(scanDate);
+        }
+
+        public int getItemId() {
+            return itemId;
         }
 
         public String getItemName() {
             return itemName.get();
         }
 
-        public SimpleStringProperty itemNameProperty() {
-            return itemName;
-        }
-
         public String getScanDate() {
             return scanDate.get();
+        }
+
+        public SimpleStringProperty itemNameProperty() {
+            return itemName;
         }
 
         public SimpleStringProperty scanDateProperty() {
             return scanDate;
         }
+
     }
+
 }

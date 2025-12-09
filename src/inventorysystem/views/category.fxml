@@ -9,6 +9,8 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
@@ -17,7 +19,11 @@
 <AnchorPane xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="inventorysystem.controllers.CategoryController">
 
     <children>
-        <VBox layoutY="2.0" prefHeight="600.0" prefWidth="800.0" spacing="15.0">
+        <VBox spacing="15.0"
+              style="-fx-padding: 20;
+             -fx-background-color: #ffffff;
+             -fx-background-radius: 10;
+             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 16, 0.1, 0, 3);">
             <padding>
                 <Insets bottom="15.0" left="20.0" right="20.0" top="15.0"/>
             </padding>
@@ -59,6 +65,24 @@
                     <TableColumn fx:id="colCategoryName" prefWidth="300.0" text="Category Name"/>
                 </columns>
             </TableView>
+            <!-- Pagination Footer -->
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10 0 0 0;">
+
+                <!-- Left side: Prev / Page info / Next -->
+                <Button fx:id="btnPrev" text="Previous" />
+                <Label fx:id="lblPageInfo" text="Page 1 of 1" />
+                <Button fx:id="btnNext" text="Next" />
+
+                <!-- Push content to right -->
+                <Pane HBox.hgrow="ALWAYS"/>
+
+                <!-- Right side -->
+                <HBox spacing="5" alignment="CENTER_RIGHT">
+                    <Label text="Rows per page:" />
+                    <ComboBox fx:id="rowsPerPageCombo" prefWidth="80" />
+                </HBox>
+
+            </HBox>
         </VBox>
     </children>
 </AnchorPane>

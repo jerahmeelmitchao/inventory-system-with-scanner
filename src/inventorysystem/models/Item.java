@@ -31,6 +31,23 @@ public class Item {
 
     private String description;
 
+    public Item(int itemId, String itemName, String itemCode, int categoryId, String unit, LocalDate dateAcquired, String status, String storageLocation, int inchargeId, String inChargeName, String categoryName, String addedBy, LocalDateTime lastScanned, String description) {
+        this.itemId = itemId;
+        this.itemName = itemName;
+        this.itemCode = itemCode;
+        this.categoryId = categoryId;
+        this.unit = unit;
+        this.dateAcquired = dateAcquired;
+        this.status = status;
+        this.storageLocation = storageLocation;
+        this.inchargeId = inchargeId;
+        this.inChargeName = inChargeName;
+        this.categoryName = categoryName;
+        this.addedBy = addedBy;
+        this.lastScanned = lastScanned;
+        this.description = description;
+    }
+
     // Required empty constructor
     public Item() {}
 

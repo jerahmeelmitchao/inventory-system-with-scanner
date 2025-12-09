@@ -7,55 +7,80 @@
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="inventorysystem.controllers.AddItemController"
-            style="-fx-background-color: white; -fx-padding: 20;">
-    
-    <ScrollPane fitToWidth="true" fitToHeight="true">
+            styleClass="root-bg">
+
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                styleClass="scroll-pane">
         <content>
-            <VBox spacing="15">
-                <GridPane hgap="10" vgap="10">
-                    <columnConstraints>
-                        <ColumnConstraints halignment="RIGHT" minWidth="150"/>
-                        <ColumnConstraints halignment="LEFT" minWidth="250"/>
-                    </columnConstraints>
 
-                    <!-- BASIC INFO -->
-                    <Label text="Item Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                    <TextField fx:id="itemNameField" promptText="Enter item name" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <VBox spacing="30" alignment="TOP_CENTER">
+                <padding>
+                    <Insets top="40" right="40" bottom="40" left="40"/>
+                </padding>
 
-                    <Label text="Barcode:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                    <TextField fx:id="barcodeField" promptText="Enter unique barcode" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <VBox spacing="25" maxWidth="600" styleClass="card">
 
-                    <Label text="Category:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <ComboBox fx:id="categoryComboBox" promptText="Select category" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                    <Label text="Add New Item" styleClass="title"/>
 
-                    <Label text="Unit:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                    <TextField fx:id="unitField" promptText="e.g. pcs, sets" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                    <VBox spacing="18">
 
-                    <!-- NEW STATUS FIELD -->
-                    <Label text="Status:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                    <ComboBox fx:id="statusComboBox" 
-                              promptText="Available, Damaged, Borrowed, Missing, Disposed"
-                              GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                        <TextField fx:id="itemNameField"
+                                   promptText="Item name"
+                                   styleClass="input"/>
 
-                    <!-- ADDITIONAL INFO -->
-                    <Label text="Date Acquired:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-                    <DatePicker fx:id="dateAcquiredPicker" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                        <ComboBox fx:id="categoryComboBox"
+                                  promptText="Select category"
+                                  styleClass="input"/>
 
-                    <Label text="Storage Location:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-                    <TextField fx:id="locationField" promptText="e.g. Room 101, Storage Room" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                        <TextField fx:id="unitField"
+                                   promptText="Unit (pcs, sets)"
+                                   styleClass="input"/>
 
-                    <Label text="In-Charge:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
-                    <ComboBox fx:id="inChargeComboBox" promptText="Select person in charge" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+                        <ComboBox fx:id="statusComboBox"
+                                  promptText="Status"
+                                  styleClass="input"/>
 
-                    <Label text="Added By:" GridPane.rowIndex="8" GridPane.columnIndex="0"/>
-                    <TextField fx:id="addedByField" promptText="Enter username" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
-                </GridPane>
+                        <DatePicker fx:id="dateAcquiredPicker"
+                                    promptText="Date acquired"
+                                    styleClass="input"/>
 
-                <HBox spacing="10" alignment="CENTER_RIGHT">
-                    <Button text="Cancel" onAction="#handleCancel" styleClass="cancel-btn"/>
-                    <Button text="Save Item" onAction="#handleSave" styleClass="primary-btn"/>
-                </HBox>
+                        <TextField fx:id="locationField"
+                                   promptText="Storage location"
+                                   styleClass="input"/>
+
+                        <ComboBox fx:id="inChargeComboBox"
+                                  promptText="Person in charge"
+                                  styleClass="input"/>
+
+                        <!-- ✅ DESCRIPTION FIELD ADDED -->
+                        <TextArea fx:id="descriptionField"
+                                  promptText="Description / notes (optional)"
+                                  wrapText="true"
+                                  style="-fx-pref-height: 90;"
+                                  styleClass="input"/>
+
+                        <TextField fx:id="addedByField"
+                                   promptText="Added by"
+                                   styleClass="input"
+                                   editable="false"/>
+                    </VBox>
+
+                    <HBox spacing="12" alignment="CENTER_RIGHT">
+                        <Button fx:id="cancelButton"
+                                text="Cancel"
+                                onAction="#handleCancel"
+                                styleClass="btn-secondary"/>
+
+                        <Button text="Save Item"
+                                onAction="#handleSave"
+                                styleClass="btn-primary"/>
+                    </HBox>
+
+                </VBox>
+
             </VBox>
+
         </content>
     </ScrollPane>
+
 </AnchorPane>

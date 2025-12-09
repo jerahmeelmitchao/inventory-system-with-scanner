@@ -25,8 +25,8 @@ public class ItemDetailsController {
 
     private final ItemDAO itemDAO = new ItemDAO();
 
-    public void loadItem(String itemName) {
-        Item item = itemDAO.getItemByName(itemName);
+    public void loadItem(int itemId) {
+        Item item = itemDAO.getItemById(itemId);
 
         if (item == null) {
             lblName.setText("Item not found.");
@@ -39,11 +39,9 @@ public class ItemDetailsController {
         lblStatus.setText(item.getStatus());
         lblLocation.setText(item.getStorageLocation());
 
-        if (item.getLastScanned() != null) {
-            lblLastScan.setText(item.getLastScanned().toString());
-        } else {
-            lblLastScan.setText("—");
-        }
+        lblLastScan.setText(
+                item.getLastScanned() != null ? item.getLastScanned().toString() : "—"
+        );
 
         txtDescription.setText(item.getDescription());
     }

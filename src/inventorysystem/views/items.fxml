@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -24,13 +25,16 @@
     </stylesheets>
 
     <children>
-        <VBox prefHeight="720" prefWidth="950" spacing="15">
+        <VBox prefHeight="720" prefWidth="950" spacing="15"
+              style="-fx-background-color: #ffffff;
+             -fx-background-radius: 10;
+             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 16, 0.1, 0, 3);">
             <padding>
                 <Insets bottom="15" left="20" right="20" top="15" />
             </padding>
 
             <!-- Title -->
-             <Label text="Inventory Items"
+            <Label text="Inventory Items"
                    style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
 
             <!-- Filter Bar -->
@@ -41,7 +45,7 @@
 
                 <ComboBox fx:id="filterStatusComboBox" prefWidth="200" promptText="Filter by Status" />
 
-                <Button fx:id="clearFilterButton" maxHeight="35" onAction="#handleClearFilters" prefWidth="100" styleClass="neutral-btn" text="Clear Filters" />
+                <Button fx:id="clearFilterButton" maxHeight="35" onAction="#handleClearFilters" prefWidth="100" styleClass="neutral-btn" text="Clear" />
             </HBox>
 
             <!-- Action Buttons -->
@@ -49,10 +53,11 @@
                 <Button fx:id="addButton" onAction="#handleAddItem" styleClass="primary-btn" text="Add Item" />
                 <Button fx:id="updateButton" onAction="#handleUpdate" styleClass="secondary-btn" text="Update Item" />
                 <Button fx:id="deleteButton" onAction="#handleDelete" styleClass="danger-btn" text="Delete Item" />
-
+                <!-- View Details Button (NEW) -->
+                <Button fx:id="viewDetailsButton" onAction="#handleViewDetails" styleClass="secondary-btn" text="View Details"/>
                 <!-- Export button WITH icon (same button structure) -->
                 <Button fx:id="exportButton" onAction="#handleExport" styleClass="secondary-btn" text=" 📥 Export"/>
-                 <Button fx:id="exportBarcodeButton" onAction="#handleExportBarcode" styleClass="secondary-btn" text="🏷️ Export Barcode" />
+                <Button fx:id="exportBarcodeButton" onAction="#handleExportBarcode" styleClass="secondary-btn" text="🏷️ Export Barcode" />
             </HBox>
 
 
@@ -71,6 +76,25 @@
                     </columns>
                 </TableView>
             </ScrollPane>
+            <!-- Pagination Footer -->
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10 0 0 0;">
+
+                <!-- Left pagination controls -->
+                <Button fx:id="btnPrev" text="Previous" />
+                <Label fx:id="lblPageInfo" text="Page 1 of 1" />
+                <Button fx:id="btnNext" text="Next" />
+
+                <!-- Spacer to push items right -->
+                <Pane HBox.hgrow="ALWAYS"/>
+
+                <!-- Bottom right: Rows per page -->
+                <HBox spacing="5" alignment="CENTER_RIGHT">
+                    <Label text="Rows per page:"/>
+                    <ComboBox fx:id="rowsPerPageCombo" prefWidth="80"/>
+                </HBox>
+            </HBox>
+
+
         </VBox>
     </children>
 </AnchorPane>
