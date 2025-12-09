@@ -1202,32 +1202,115 @@ public class ItemController {
         }
     }
 
+    // ---------------------------
+// Replace your handleExportBarcode()
+// with this Stage-based popup
+// ---------------------------
     @FXML
     private void handleExportBarcode() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Export Barcodes");
-        alert.setHeaderText("Choose items to export");
-        alert.setContentText("Export ALL items or only SELECTED items?");
-
-        ButtonType allBtn = new ButtonType("All Items");
-        ButtonType selectedBtn = new ButtonType("Selected Items");
-        ButtonType cancelBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        alert.getButtonTypes().setAll(allBtn, selectedBtn, cancelBtn);
-        alert.initOwner(exportBarcodeButton.getScene().getWindow());
-
-        alert.showAndWait().ifPresent(type -> {
-            if (type == allBtn) {
-                exportBarcodesPDF(masterData);
-            }
-            if (type == selectedBtn) {
-                List<Item> selected = itemTable.getSelectionModel().getSelectedItems();
-                if (selected.isEmpty()) {
-                    showAlert("Warning", "No Items Selected", "Select at least one item.");
-                    return;
-                }
-                exportBarcodesPDF(selected);
-            }
-        });
+        showExportBarcodePopup();
     }
+
+    private void showExportBarcodePopup() {
+
+        VBox card = new VBox(14);
+        card.setStyle("""
+        -fx-background-color: white;
+        -fx-padding: 20;
+        -fx-background-radius: 12;
+        -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.20), 16, 0, 0, 6);
+    """);
+
+        Label title = new Label("📦 Export Barcodes");
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill:#2c3e50;");
+
+        Label subtitle = new Label("Choose how you want to export barcodes:");
+        subtitle.setStyle("-fx-font-size: 12px; -fx-text-fill:#555;");
+
+        // Option button style
+        String optionStyle = """
+        -fx-background-color: #f6f8fa;
+        -fx-padding: 12;
+        -fx-background-radius: 8;
+        -fx-font-size: 14px;
+        -fx-alignment: center-left;
+    """;
+
+        Button btnAll = new Button("📄 Export All Items");
+        btnAll.setMaxWidth(Double.MAX_VALUE);
+        btnAll.setStyle(optionStyle);
+
+        Button btnSelected = new Button("🔎 Export Selected Items");
+        btnSelected.setMaxWidth(Double.MAX_VALUE);
+        btnSelected.setStyle(optionStyle);
+
+        btnAll.setOnMouseEntered(e -> btnAll.setStyle(optionStyle.replace("#f6f8fa", "#e8f0fe")));
+        btnAll.setOnMouseExited(e -> btnAll.setStyle(optionStyle));
+
+        btnSelected.setOnMouseEntered(e -> btnSelected.setStyle(optionStyle.replace("#f6f8fa", "#e8f0fe")));
+        btnSelected.setOnMouseExited(e -> btnSelected.setStyle(optionStyle));
+
+        // ONE CANCEL BUTTON ONLY
+        Button btnCancel = new Button("Cancel");
+        btnCancel.setStyle("""
+        -fx-background-color: #d9534f;
+        -fx-text-fill: white;
+        -fx-padding: 8 18;
+        -fx-background-radius: 8;
+        -fx-font-size: 14px;
+    """);
+
+        HBox footer = new HBox(btnCancel);
+        footer.setStyle("-fx-alignment: center; -fx-padding: 10 0 0 0;");
+
+        card.getChildren().addAll(title, subtitle, btnAll, btnSelected, footer);
+        card.setPrefWidth(360);
+
+        // Create popup window
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.setAlwaysOnTop(true);
+        popup.setTitle("Export Barcodes");
+        popup.setResizable(false);
+
+        Scene scene = new Scene(card);
+        popup.setScene(scene);
+
+        // Cancel closes popup
+        btnCancel.setOnAction(e -> popup.close());
+
+        // Export ALL items
+        btnAll.setOnAction(e -> {
+            popup.close(); // close FIRST
+            exportBarcodesPDF(new ArrayList<>(masterData));
+        });
+
+        // Export SELECTED items
+        btnSelected.setOnAction(e -> {
+            List<Item> selected = itemTable.getSelectionModel().getSelectedItems();
+
+            if (selected == null || selected.isEmpty()) {
+                // TOPMOST ERROR
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("No Items Selected");
+                alert.setHeaderText("You must select at least one item.");
+                alert.setContentText("Please select items from the table.");
+
+                // Make sure the alert is on top of EVERY window
+                Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+                alertStage.initModality(Modality.APPLICATION_MODAL);
+                alertStage.toFront();
+                alertStage.setAlwaysOnTop(true);
+
+                alert.showAndWait();
+                return;
+            }
+
+            popup.close();  // close popup FIRST
+            exportBarcodesPDF(new ArrayList<>(selected));
+        });
+
+        popup.show();
+    }
+
 }

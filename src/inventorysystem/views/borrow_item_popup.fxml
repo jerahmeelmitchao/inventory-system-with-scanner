@@ -1,32 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="inventorysystem.controllers.BorrowItemPopupController"
-      spacing="12"
-      style="-fx-padding: 15;">
-    
-    <Label text="Select Borrower:" style="-fx-font-size: 16px;"/>
+      spacing="15"
+      style="-fx-padding: 20; -fx-background-radius: 12; -fx-background-color: #ffffff;">
 
-    
+    <!-- Title -->
+    <Label text="Borrow Item"
+           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
 
-    <ComboBox fx:id="borrowerDropdown" prefWidth="280"/>
+    <!-- Instruction -->
+    <Label text="Select Borrower:"
+           style="-fx-font-size: 14px; -fx-text-fill: #34495e;" />
+
+    <ComboBox fx:id="borrowerDropdown"
+              prefWidth="320"
+              style="-fx-background-radius: 8; -fx-padding: 6;" />
 
     <HBox spacing="10">
+        <!-- Borrow button -->
         <Button text="Borrow"
                 onAction="#borrowItem"
-                style="-fx-background-color: #27ae60; -fx-text-fill: white;"/>
+                style="-fx-background-color: #27ae60; -fx-text-fill: white;
+                       -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 18;" />
 
+        <!-- Add Borrower -->
         <Button text="Add Borrower"
                 onAction="#addBorrower"
-                style="-fx-background-color: #e67e22; -fx-text-fill: white;"/>
+                style="-fx-background-color: #e67e22; -fx-text-fill: white;
+                       -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 18;" />
+        
+        <!-- Cancel button -->
+        <Button text="Cancel"
+                onAction="#cancelPopup"
+                style="-fx-background-color: #bdc3c7; -fx-text-fill: #2c3e50;
+                       -fx-background-radius: 8; -fx-padding: 8 18;" />
     </HBox>
 
 </VBox>
-

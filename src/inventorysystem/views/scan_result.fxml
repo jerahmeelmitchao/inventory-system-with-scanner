@@ -1,39 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="inventorysystem.controllers.ScanResultController"
-            prefWidth="350" prefHeight="200"
-            style="-fx-background-color: white; -fx-padding: 15;">
 
-    <children>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="inventorysystem.controllers.ScanResultController"
+      spacing="18"
+      prefWidth="430"
+      style="
+          -fx-background-color: #ffffff;
+          -fx-background-radius: 18;
+          -fx-padding: 24;
+          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 25, 0, 0, 4);
+      ">
 
-        <Label text="Item Details" layoutX="10" layoutY="5"
-               style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+    <!-- HEADER -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <VBox spacing="3">
+            <Label text="Item Details"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+            <Rectangle height="3" width="110" arcHeight="4" arcWidth="4"
+                       style="-fx-fill: linear-gradient(to right, #3498db, #2ecc71);" />
+        </VBox>
+    </HBox>
 
-        <Label text="Name:" layoutX="20" layoutY="50"/>
-        <Label fx:id="itemName" layoutX="120" layoutY="50"/>
+    <!-- CONTENT CARD -->
+    <VBox spacing="14"
+          style="-fx-background-color: #f8f9fa; -fx-background-radius: 12; -fx-padding: 18;">
 
-        <Label text="Description:" layoutX="20" layoutY="80"/>
-        <Label fx:id="description" layoutX="120" layoutY="80"/>
+        <!-- NAME -->
+        <HBox spacing="8">
+            <Label text="Name:"
+                   style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+            <Label fx:id="itemName"
+                   style="-fx-font-size: 15px; -fx-text-fill: #2c3e50;" />
+        </HBox>
 
-        <Label text="Status:" layoutX="20" layoutY="110"/>
-        <Label fx:id="status" layoutX="120" layoutY="110"/>
+        <!-- DESCRIPTION -->
+        <VBox spacing="5">
+            <Label text="Description:"
+                   style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+            <Label fx:id="description" wrapText="true"
+                   style="-fx-font-size: 14px; -fx-text-fill: #4b4b4b;" />
+        </VBox>
 
-        <Button text="Borrow Item" layoutX="40" layoutY="150"
-                fx:id="borrowItemBtn"
+        <!-- STATUS TAG -->
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <Label text="Status:"
+                   style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
+            
+            <Label fx:id="status"
+                   style="
+                       -fx-font-size: 13px;
+                       -fx-background-radius: 12;
+                       -fx-padding: 4 12;
+                       -fx-text-fill: white;
+                   " />
+        </HBox>
+    </VBox>
+
+    <!-- BUTTONS -->
+    <HBox spacing="15" alignment="CENTER">
+
+        <Button fx:id="borrowItemBtn"
+                text="Borrow Item"
                 onAction="#handleBorrowItem"
-                style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
+                style="
+                    -fx-background-color: linear-gradient(to right, #27ae60, #2ecc71);
+                    -fx-text-fill: white;
+                    -fx-font-size: 14px;
+                    -fx-font-weight: bold;
+                    -fx-background-radius: 10;
+                    -fx-padding: 10 18;
+                " />
 
-        <Button text="Borrow Records" layoutX="180" layoutY="150"
+        <Button text="Borrow Records"
                 onAction="#handleBorrowRecords"
-                style="-fx-background-color: #3498db; -fx-text-fill: white;"/>
+                style="
+                    -fx-background-color: linear-gradient(to right, #2980b9, #3498db);
+                    -fx-text-fill: white;
+                    -fx-font-size: 14px;
+                    -fx-font-weight: bold;
+                    -fx-background-radius: 10;
+                    -fx-padding: 10 18;
+                " />
+    </HBox>
 
-    </children>
-</AnchorPane>
-
+</VBox>

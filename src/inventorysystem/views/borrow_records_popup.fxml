@@ -1,24 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="inventorysystem.controllers.BorrowRecordsPopupController"
-            prefWidth="600" prefHeight="300">
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="inventorysystem.controllers.BorrowRecordsPopupController"
+      spacing="15"
+      style="-fx-padding: 20; -fx-background-color: #ffffff; -fx-background-radius: 12;"
+      prefWidth="650" prefHeight="380">
 
-    <TableView fx:id="recordsTable" layoutX="10" layoutY="10"
-               prefWidth="580" prefHeight="280">
+    <!-- TITLE -->
+    <Label text="Borrow Records"
+           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+
+    <!-- SUBTITLE -->
+    <Label text="All borrow history for this item"
+           style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d;" />
+
+    <!-- TABLE CONTAINER -->
+    <TableView fx:id="recordsTable"
+               style="-fx-background-radius: 10; -fx-border-radius: 10;"
+               prefHeight="300">
 
         <columns>
-            <TableColumn fx:id="colBorrower" text="Borrower" prefWidth="150"/>
+            <TableColumn fx:id="colBorrower" text="Borrower" prefWidth="170"/>
             <TableColumn fx:id="colBorrowDate" text="Borrow Date" prefWidth="150"/>
             <TableColumn fx:id="colReturnDate" text="Return Date" prefWidth="150"/>
             <TableColumn fx:id="colStatus" text="Status" prefWidth="120"/>
         </columns>
+
     </TableView>
 
-</AnchorPane>
+    <!-- BUTTONS -->
+    <HBox alignment="CENTER_RIGHT" spacing="10">
+        <Button fx:id="btnClose"
+                text="Close"
+                onAction="#closePopup"
+                style="-fx-background-color: #bdc3c7; -fx-text-fill: #2c3e50;
+               -fx-font-weight: bold; -fx-background-radius: 8;
+               -fx-padding: 8 20;" />
+
+    </HBox>
+
+</VBox>

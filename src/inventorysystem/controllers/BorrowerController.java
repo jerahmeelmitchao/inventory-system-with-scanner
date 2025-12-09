@@ -117,7 +117,7 @@ public class BorrowerController {
         });
 
         filterPositionCombo.setItems(positions);
-        filterPositionCombo.setValue("All");
+//        filterPositionCombo.setValue("All");
     }
 
     // -----------------------------------------
@@ -126,9 +126,9 @@ public class BorrowerController {
     private void setupFilters() {
 
         filterTypeCombo.setItems(FXCollections.observableArrayList("All", "Student", "Teacher", "Staff"));
-        filterTypeCombo.setValue("All");
+//        filterTypeCombo.setValue("All");
 
-        filterPositionCombo.setValue("All");
+//        filterPositionCombo.setValue("All");
 
         searchField.textProperty().addListener((a, b, c) -> applyFilters());
         filterTypeCombo.valueProperty().addListener((a, b, c) -> applyFilters());
@@ -137,27 +137,35 @@ public class BorrowerController {
 
     private void applyFilters() {
 
-        String search = searchField.getText().toLowerCase().trim();
+        String search = searchField.getText() == null ? "" : searchField.getText().toLowerCase().trim();
         String type = filterTypeCombo.getValue();
         String position = filterPositionCombo.getValue();
 
         ObservableList<Borrower> filtered = borrowerList.filtered(b -> {
 
-            boolean matchSearch
-                    = b.getBorrowerName().toLowerCase().contains(search)
-                    || b.getPosition().toLowerCase().contains(search);
+            // SAFE STRINGS (never null)
+            String name = b.getBorrowerName() == null ? "" : b.getBorrowerName().toLowerCase();
+            String pos = b.getPosition() == null ? "" : b.getPosition().toLowerCase();
+            String bType = b.getBorrowerType() == null ? "" : b.getBorrowerType().toLowerCase();
 
-            boolean matchType
-                    = type.equals("All") || b.getBorrowerType().equalsIgnoreCase(type);
+            // SEARCH
+            boolean matchSearch = name.contains(search) || pos.contains(search);
 
-            boolean matchPosition
-                    = position.equals("All") || b.getPosition().equalsIgnoreCase(position);
+            // TYPE FILTER
+            boolean matchType = type == null
+                    || type.equals("All")
+                    || bType.equals(type.toLowerCase());
+
+            // POSITION FILTER
+            boolean matchPosition = position == null
+                    || position.equals("All")
+                    || pos.equals(position.toLowerCase());
 
             return matchSearch && matchType && matchPosition;
         });
 
         borrowerTable.setItems(filtered);
-        setupActionColumn(); // <<<<<<<<<<<<<<<<<< REAPPLY ACTION COLUMN
+        setupActionColumn();
     }
 
     @FXML
@@ -191,14 +199,43 @@ public class BorrowerController {
     @FXML
     private void handleDelete() {
         if (selectedBorrower == null) {
+            showAlert("Error", "Select a borrower first.");
             return;
         }
 
-        if (borrowerDAO.deleteBorrower(selectedBorrower.getBorrowerId())) {
-            borrowerList.remove(selectedBorrower);
-            populatePositionFilter();
-            handleCancel();
-        }
+        // ---- CONFIRMATION DIALOG ----
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirm Delete");
+        confirm.setHeaderText("Delete Borrower");
+        confirm.setContentText(
+                "Are you sure you want to delete:\n\n"
+                + selectedBorrower.getBorrowerName() + "\n(" + selectedBorrower.getPosition() + ")\n\n"
+                + "This action cannot be undone."
+        );
+
+        ButtonType yesBtn = new ButtonType("Yes, Delete");
+        ButtonType noBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        confirm.getButtonTypes().setAll(yesBtn, noBtn);
+
+        // Show dialog in front of current window
+        confirm.initOwner(borrowerTable.getScene().getWindow());
+
+        confirm.showAndWait().ifPresent(response -> {
+
+            if (response == yesBtn) {
+
+                // perform delete
+                if (borrowerDAO.deleteBorrower(selectedBorrower.getBorrowerId())) {
+
+                    borrowerList.remove(selectedBorrower);
+                    populatePositionFilter();
+                    handleCancel();
+
+                    showAlert("Success", "Borrower deleted successfully.");
+                }
+            }
+        });
     }
 
     @FXML
