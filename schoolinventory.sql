@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 08, 2025 at 03:01 PM
+-- Generation Time: Dec 09, 2025 at 03:05 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -48,15 +48,6 @@ CREATE TABLE `borrowers` (
   `borrower_type` enum('Student','Teacher','Staff') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `borrowers`
---
-
-INSERT INTO `borrowers` (`borrower_id`, `borrower_name`, `position`, `borrower_type`) VALUES
-(1, 'John Dela Cruz', 'BSIT3', 'Student'),
-(2, 'Mary Ann', 'Teacher I', 'Teacher'),
-(3, 'James Tann', 'Technician', 'Staff');
-
 -- --------------------------------------------------------
 
 --
@@ -69,20 +60,9 @@ CREATE TABLE `borrow_records` (
   `borrower_id` int(11) NOT NULL,
   `borrow_date` datetime NOT NULL DEFAULT current_timestamp(),
   `return_date` datetime DEFAULT NULL,
-  `quantity_borrowed` int(11) NOT NULL CHECK (`quantity_borrowed` > 0),
   `status` enum('Borrowed','Returned','Overdue','Cancelled') NOT NULL DEFAULT 'Borrowed',
   `remarks` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `borrow_records`
---
-
-INSERT INTO `borrow_records` (`record_id`, `item_id`, `borrower_id`, `borrow_date`, `return_date`, `quantity_borrowed`, `status`, `remarks`) VALUES
-(1, 1, 1, '2025-09-01 09:00:00', '2025-09-03 15:00:00', 1, 'Returned', 'Routine use'),
-(2, 3, 2, '2025-09-10 08:30:00', '2025-09-14 10:00:00', 2, 'Returned', 'Meeting room'),
-(3, 5, 1, '2025-09-15 11:00:00', NULL, 1, 'Borrowed', 'Sports event'),
-(4, 8, 3, '2025-10-10 13:00:00', NULL, 1, 'Borrowed', 'Workshop use');
 
 -- --------------------------------------------------------
 
@@ -94,17 +74,6 @@ CREATE TABLE `categories` (
   `category_id` int(11) NOT NULL,
   `category_name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `categories`
---
-
-INSERT INTO `categories` (`category_id`, `category_name`) VALUES
-(1, 'Electronics'),
-(2, 'Furniture'),
-(3, 'Sports'),
-(4, 'Stationery'),
-(5, 'Tools');
 
 -- --------------------------------------------------------
 
@@ -120,18 +89,6 @@ CREATE TABLE `incharge` (
   `assigned_category_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `incharge`
---
-
-INSERT INTO `incharge` (`incharge_id`, `incharge_name`, `position`, `contact_info`, `assigned_category_id`) VALUES
-(1, 'Mark Santos', 'Electronics Supervisor', '09121234567', 1),
-(2, 'Anna Lopez', 'Furniture Manager', '09221234567', 2),
-(3, 'Carlos Reyes', 'Gym Attendant', '09331234567', 3),
-(4, 'Lisa Ramos', 'Inventory Clerk', '09441234567', 4),
-(5, 'Ben Castillo', 'Workshop Lead', '09551234567', 5),
-(6, 'Juan trh', 'Faculty', '99755755755', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -144,6 +101,7 @@ CREATE TABLE `items` (
   `barcode` varchar(100) DEFAULT NULL,
   `category_id` int(11) DEFAULT NULL,
   `unit` varchar(50) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
   `date_acquired` date DEFAULT NULL,
   `last_scanned` datetime DEFAULT NULL,
   `storage_location` varchar(100) DEFAULT NULL,
@@ -151,22 +109,6 @@ CREATE TABLE `items` (
   `added_by` varchar(100) DEFAULT NULL,
   `status` enum('Available','Damaged','Borrowed','Missing','Disposed') NOT NULL DEFAULT 'Available'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `items`
---
-
-INSERT INTO `items` (`item_id`, `item_name`, `barcode`, `category_id`, `unit`, `date_acquired`, `last_scanned`, `storage_location`, `incharge_id`, `added_by`, `status`) VALUES
-(1, 'Laptop Dell Inspiron', 'ELEC001', 1, 'pcs', '2025-01-10', '2025-10-10 09:30:00', 'Room 101', 1, 'admin', 'Borrowed'),
-(2, 'Smart TV Samsung', 'ELEC002', 1, 'pcs', '2025-02-15', '2025-08-25 10:00:00', 'AV Room', 1, 'admin', 'Available'),
-(3, 'Office Table', 'FUR001', 2, 'pcs', '2025-03-20', '2025-09-05 14:00:00', 'Room 201', 2, 'admin', 'Available'),
-(4, 'Whiteboard', 'FUR002', 2, 'pcs', '2025-04-02', NULL, 'Room 202', 2, 'staff1', 'Available'),
-(5, 'Basketball', 'SPT001', 3, 'pcs', '2025-05-01', '2025-07-22 16:00:00', 'Gym', 3, 'staff1', 'Available'),
-(6, 'Volleyball Net', 'SPT002', 3, 'pcs', '2025-06-15', NULL, 'Gym', 3, 'staff2', 'Available'),
-(7, 'Bond Paper A4', 'STA001', 4, 'sheets', '2025-07-01', '2025-09-30 11:00:00', 'Storage Room', 4, 'staff2', 'Available'),
-(8, 'Hammer', 'TOO001', 5, 'pcs', '2025-08-10', '2025-10-05 09:30:00', 'Workshop', 5, 'admin', 'Available'),
-(9, 'Screwdriver Set', 'TOO002', 5, 'sets', '2025-09-01', NULL, 'Workshop', 5, 'admin', 'Available'),
-(10, 'Printer Canon LBP', 'ELEC003', 1, 'pcs', '2025-09-15', '2025-10-01 08:45:00', 'Room 103', 1, 'staff1', 'Available');
 
 -- --------------------------------------------------------
 
@@ -179,20 +121,6 @@ CREATE TABLE `scan_log` (
   `item_id` int(11) NOT NULL,
   `scan_date` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `scan_log`
---
-
-INSERT INTO `scan_log` (`scan_id`, `item_id`, `scan_date`) VALUES
-(1, 1, '2025-05-02 09:00:00'),
-(2, 1, '2025-06-12 14:30:00'),
-(3, 2, '2025-07-15 13:00:00'),
-(4, 3, '2025-08-22 10:00:00'),
-(5, 5, '2025-08-25 11:00:00'),
-(6, 7, '2025-09-10 09:15:00'),
-(7, 8, '2025-10-05 09:30:00'),
-(8, 10, '2025-10-10 14:00:00');
 
 -- --------------------------------------------------------
 
@@ -208,16 +136,6 @@ CREATE TABLE `users` (
   `firstName` varchar(100) DEFAULT NULL,
   `lastName` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `username`, `password`, `created_at`, `firstName`, `lastName`) VALUES
-(1, 'administrator', 'Admin_123', '2025-10-01 13:01:49', NULL, NULL),
-(2, 'admin', 'admin', '2025-12-06 19:50:35', 'Jerahmeel', 'Mitchao'),
-(4, 'admin1', 'admin', '2025-12-08 12:18:03', 'Juan', 'Dela Cruz'),
-(5, 'qwerty', '123', '2025-12-08 13:43:19', 'qwerty', 'asdfg');
 
 --
 -- Indexes for dumped tables
@@ -301,7 +219,7 @@ ALTER TABLE `borrowers`
 -- AUTO_INCREMENT for table `borrow_records`
 --
 ALTER TABLE `borrow_records`
-  MODIFY `record_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `record_id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -319,13 +237,13 @@ ALTER TABLE `incharge`
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `scan_log`
 --
 ALTER TABLE `scan_log`
-  MODIFY `scan_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `scan_id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`

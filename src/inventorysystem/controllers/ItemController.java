@@ -29,6 +29,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.BorrowerDAO;
 import inventorysystem.models.Borrower;
 import java.io.FileOutputStream;
@@ -1427,5 +1428,107 @@ public class ItemController {
             e.printStackTrace();
             showAlert("Error", "Failed to open item details.", e.getMessage());
         }
+    }
+
+    private void showBarcodeSuccessPopup(String message) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initStyle(javafx.stage.StageStyle.UNDECORATED);
+        popup.setAlwaysOnTop(true);
+
+        VBox root = new VBox(12);
+        root.setAlignment(Pos.CENTER);
+        root.setStyle("""
+        -fx-background-color: white;
+        -fx-padding: 25;
+        -fx-background-radius: 14;
+        -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 20, 0, 0, 5);
+    """);
+
+        Label icon = new Label("✔");
+        icon.setStyle("-fx-font-size: 42px; -fx-text-fill: #2ecc71;");
+
+        Label title = new Label("Export Successful");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill:#2c3e50;");
+
+        Label msg = new Label(message);
+        msg.setStyle("-fx-font-size: 14px; -fx-text-fill:#555;");
+
+        root.getChildren().addAll(icon, title, msg);
+
+        Scene scene = new Scene(root, 300, 180);
+        popup.setScene(scene);
+
+        // Fade animation
+        root.setOpacity(0);
+        javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(javafx.util.Duration.millis(200), root);
+        ft.setFromValue(0);
+        ft.setToValue(1);
+        ft.play();
+
+        // Auto-close after 1.5s
+        new Thread(() -> {
+            try {
+                Thread.sleep(1500);
+            } catch (Exception ignored) {
+            }
+            javafx.application.Platform.runLater(() -> popup.close());
+        }).start();
+
+        popup.show();
+    }
+
+    private void showExportSuccess(String filePath) {
+
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initStyle(javafx.stage.StageStyle.UNDECORATED); // remove X
+
+        VBox box = new VBox(18);
+        box.setStyle("""
+        -fx-background-color: white;
+        -fx-padding: 25;
+        -fx-background-radius: 14;
+        -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.30), 22, 0, 0, 6);
+    """);
+
+        Label title = new Label("✔ Export Successful");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill:#2c3e50;");
+
+        Label msg = new Label("Your file has been saved.\n\n" + filePath);
+        msg.setStyle("-fx-font-size: 13px; -fx-text-fill:#555;");
+        msg.setWrapText(true);
+
+        Button okBtn = new Button("OK");
+        okBtn.setStyle("""
+        -fx-background-color: #3498db;
+        -fx-text-fill: white;
+        -fx-padding: 10 25;
+        -fx-background-radius: 8;
+        -fx-font-size: 14px;
+        -fx-font-weight: bold;
+    """);
+
+        okBtn.setOnAction(e -> popup.close());
+
+        box.getChildren().addAll(title, msg, okBtn);
+        box.setAlignment(javafx.geometry.Pos.CENTER);
+
+        Scene scene = new Scene(box);
+        popup.setScene(scene);
+
+        // Center relative to main window
+        Stage parent = (Stage) exportButton.getScene().getWindow();
+        popup.setX(parent.getX() + parent.getWidth() / 2 - 180);
+        popup.setY(parent.getY() + parent.getHeight() / 2 - 120);
+
+        // Fade animation
+        box.setOpacity(0);
+        javafx.animation.FadeTransition fade = new javafx.animation.FadeTransition(javafx.util.Duration.millis(170), box);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        fade.play();
+
+        popup.show();
     }
 }

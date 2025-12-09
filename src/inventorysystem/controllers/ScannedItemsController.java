@@ -31,19 +31,28 @@ public class ScannedItemsController {
     @FXML
     private TableColumn<ScannedItem, String> colScanDate;
 
-    private final ObservableList<ScannedItem> scannedList = FXCollections.observableArrayList();
-    private final DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
+    @FXML
+    private Button btnPrev, btnNext;
+    @FXML
+    private Label lblPageInfo;
+    @FXML
+    private ComboBox<Integer> rowsPerPageCombo;
 
-    private void logAction(String action, String details) {
-        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
-    }
+    // 🔥 Pagination variables (missing in your code)
+    private int currentPage = 1;
+    private int rowsPerPage = 10;
+
+    private final ObservableList<ScannedItem> scannedList = FXCollections.observableArrayList();
+    private final ObservableList<ScannedItem> filteredData = FXCollections.observableArrayList();
+    private final ObservableList<ScannedItem> currentPageData = FXCollections.observableArrayList();
+
+    private final DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
 
     @FXML
     public void initialize() {
 
         colItemName.setCellValueFactory(data -> data.getValue().itemNameProperty());
 
-        // Format scan date to human readable
         colScanDate.setCellValueFactory(data -> {
             String raw = data.getValue().getScanDate();
             String formatted = raw;
@@ -57,12 +66,17 @@ public class ScannedItemsController {
             return new SimpleStringProperty(formatted);
         });
 
-        tableScannedItems.setItems(scannedList);
+        tableScannedItems.setItems(currentPageData);
 
-        // 🔥 Load all scanned items when page opens
         loadAllScannedItems();
+
+        // 🔥 setup pagination after loading
+        setupPagination();
     }
 
+    // ============================
+    // FILTER
+    // ============================
     @FXML
     private void onFilterClicked() {
         LocalDate start = startDatePicker.getValue();
@@ -74,8 +88,21 @@ public class ScannedItemsController {
         }
 
         loadScannedItems(start, end);
+        setupPagination();
     }
 
+    @FXML
+    private void onClearFilter() {
+        startDatePicker.setValue(null);
+        endDatePicker.setValue(null);
+
+        loadAllScannedItems();
+        setupPagination();
+    }
+
+    // ============================
+    // DB LOADERS
+    // ============================
     private void loadScannedItems(LocalDate start, LocalDate end) {
         scannedList.clear();
 
@@ -100,6 +127,8 @@ public class ScannedItemsController {
                         rs.getString("scan_date")
                 ));
             }
+
+            filteredData.setAll(scannedList);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -127,11 +156,78 @@ public class ScannedItemsController {
                 ));
             }
 
+            filteredData.setAll(scannedList);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    // ============================
+    // PAGINATION LOGIC
+    // ============================
+    private void setupPagination() {
+        rowsPerPageCombo.setItems(FXCollections.observableArrayList(5, 10, 20, 30, 50));
+        rowsPerPageCombo.setValue(rowsPerPage);
+
+        rowsPerPageCombo.valueProperty().addListener((obs, old, newVal) -> {
+            if (newVal == null) {
+                return;  // 🔥 prevent crash
+            }
+            rowsPerPage = newVal;
+            currentPage = 1;
+            updatePage();
+        });
+
+        btnPrev.setOnAction(e -> {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePage();
+            }
+        });
+
+        btnNext.setOnAction(e -> {
+            if (currentPage < getTotalPages()) {
+                currentPage++;
+                updatePage();
+            }
+        });
+
+        updatePage();
+    }
+
+    private void updatePage() {
+        int total = filteredData.size();
+        int totalPages = getTotalPages();
+
+        if (totalPages == 0) {
+            totalPages = 1;
+        }
+
+        int from = (currentPage - 1) * rowsPerPage;
+        int to = Math.min(from + rowsPerPage, total);
+
+        if (from > to) {
+            currentPage = 1;
+            from = 0;
+            to = Math.min(rowsPerPage, total);
+        }
+
+        currentPageData.setAll(filteredData.subList(from, to));
+
+        lblPageInfo.setText("Page " + currentPage + " of " + totalPages);
+
+        btnPrev.setDisable(currentPage == 1);
+        btnNext.setDisable(currentPage == totalPages);
+    }
+
+    private int getTotalPages() {
+        return (int) Math.ceil((double) filteredData.size() / rowsPerPage);
+    }
+
+    // ============================
+    // VIEW DETAILS
+    // ============================
     @FXML
     private void onViewDetails() {
         ScannedItem selected = tableScannedItems.getSelectionModel().getSelectedItem();
@@ -160,9 +256,9 @@ public class ScannedItemsController {
         }
     }
 
-    // ===============================
-    // UI Table Row Model
-    // ===============================
+    // ============================
+    // MODEL
+    // ============================
     public static class ScannedItem {
 
         private final int itemId;

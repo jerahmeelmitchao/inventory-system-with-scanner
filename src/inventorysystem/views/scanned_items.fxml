@@ -22,6 +22,7 @@
 
         <!-- Filter Row -->
         <HBox spacing="10" alignment="CENTER_LEFT">
+
             <Label text="From:" style="-fx-font-weight: bold;"/>
             <DatePicker fx:id="startDatePicker" prefWidth="150"/>
 
@@ -29,12 +30,21 @@
             <DatePicker fx:id="endDatePicker" prefWidth="150"/>
 
             <Button text="🔍 Filter"
+                    fx:id="btnFilter"
                     onAction="#onFilterClicked"
                     style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 6 14; -fx-background-radius: 6;"/>
+
+            <!-- ▶ NEW: Clear Filter -->
+            <Button text="🧹 Clear"
+                    fx:id="btnClearFilter"
+                    onAction="#onClearFilter"
+                    style="-fx-background-color: #bdc3c7; -fx-text-fill: white; -fx-padding: 6 14; -fx-background-radius: 6;"/>
         </HBox>
 
-        <!-- Table -->
-        <VBox style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 15;">
+        <!-- Table + Pagination Container -->
+        <VBox spacing="12"
+              style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 15;">
+
             <TableView fx:id="tableScannedItems" prefHeight="420">
                 <columns>
                     <TableColumn fx:id="colItemName" text="Item Name" prefWidth="400"/>
@@ -46,6 +56,23 @@
                 <Button text="👁 View Item Details"
                         onAction="#onViewDetails"
                         style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-padding: 6 18; -fx-background-radius: 6;"/>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10 0 0 0;">
+
+                <!-- Left pagination controls -->
+                <Button fx:id="btnPrev" text="Previous" />
+                <Label fx:id="lblPageInfo" text="Page 1 of 1" />
+                <Button fx:id="btnNext" text="Next" />
+
+                <!-- Spacer to push items right -->
+                <Pane HBox.hgrow="ALWAYS"/>
+
+                <!-- Bottom right: Rows per page -->
+                <HBox spacing="5" alignment="CENTER_RIGHT">
+                    <Label text="Rows per page:"/>
+                    <ComboBox fx:id="rowsPerPageCombo" prefWidth="80"/>
+                </HBox>
             </HBox>
         </VBox>
 

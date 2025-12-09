@@ -1,6 +1,5 @@
 package inventorysystem.controllers;
 
-import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.ItemDAO;
 import inventorysystem.models.Item;
 import inventorysystem.models.ScanLogModel;
@@ -42,8 +41,6 @@ public class DashboardController {
     private Button logoutBtn;
     @FXML
     private Button scannedItemsBtn;
-    @FXML
-    private Button ReportsBtn;
 
     // 🔹 NEW: Borrow Records button
     @FXML

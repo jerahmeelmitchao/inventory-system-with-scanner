@@ -84,7 +84,7 @@ public class LoginController implements Initializable {
 
                     // Pass user info
                     ItemController.setLoggedUsername(user.getUsername());
-                    ItemController.setLoggedUserNames(user.getFirstName(), user.getLastName());
+                    ItemController.setLoggedUser(user.getId(), user.getUsername(), user.getFirstName(), user.getLastName());
 
                     stage.setScene(dashboardScene);
                     stage.setResizable(true);

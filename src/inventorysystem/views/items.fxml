@@ -93,8 +93,6 @@
                     <ComboBox fx:id="rowsPerPageCombo" prefWidth="80"/>
                 </HBox>
             </HBox>
-
-
         </VBox>
     </children>
 </AnchorPane>

@@ -563,6 +563,7 @@ private void handleDelete() {
         });
 
         dialog.showAndWait();
+        loadBorrowers();
     }
 
     // -----------------------------------------

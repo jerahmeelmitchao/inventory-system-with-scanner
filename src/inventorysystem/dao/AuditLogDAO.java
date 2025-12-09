@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 public class AuditLogDAO {
 
     public static void log(String username, String action, String details) {
-        String sql = "INSERT INTO audit_log (username, action_type, description) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO audit_log (user_who, event_type, description) VALUES (?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

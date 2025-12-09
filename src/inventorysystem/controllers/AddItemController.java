@@ -165,7 +165,7 @@ public class AddItemController {
         }
 
         saveNewItem(name, categoryId, unit, dateAcquired, status, location, inChargeId, addedBy, description);
-        
+
     }
 
     private Integer getCategoryId(String name) {
@@ -212,7 +212,7 @@ public class AddItemController {
             showInfo("Success", "Item added successfully!\nGenerated Barcode: " + barcode);
             AuditLogDAO.log(addedBy, "ADD_ITEM", "Added item: " + name);
             clearForm();
-
+            ((Stage) itemNameField.getScene().getWindow()).close();
         } catch (SQLException e) {
             showError("Error", "Failed to add item.", e.getMessage());
         }
