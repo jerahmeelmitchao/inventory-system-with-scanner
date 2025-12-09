@@ -16,7 +16,7 @@ public class ItemDAO {
 
         String sql = """
             INSERT INTO items 
-            (item_name, item_code, category_id, unit, date_acquired, status, 
+            (item_name, barcode, category_id, unit, date_acquired, status, 
              storage_location, incharge_id, added_by, description)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
@@ -71,7 +71,7 @@ public class ItemDAO {
 
         String sql = """
             SELECT * FROM items
-            WHERE LOWER(item_code) = LOWER(?)
+            WHERE LOWER(barcode) = LOWER(?)
         """;
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -127,7 +127,7 @@ public class ItemDAO {
 
         String sql = """
             UPDATE items SET 
-                item_name=?, item_code=?, category_id=?, unit=?, 
+                item_name=?, barcode=?, category_id=?, unit=?, 
                 date_acquired=?, status=?, storage_location=?, 
                 incharge_id=?, added_by=?, description=?
             WHERE item_id=?
@@ -273,7 +273,7 @@ public class ItemDAO {
 
         item.setItemId(rs.getInt("item_id"));
         item.setItemName(rs.getString("item_name"));
-        item.setItemCode(rs.getString("item_code"));
+        item.setItemCode(rs.getString("barcode"));
         item.setCategoryId(rs.getInt("category_id"));
         item.setUnit(rs.getString("unit"));
         item.setStatus(rs.getString("status"));
