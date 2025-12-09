@@ -4,17 +4,13 @@ import inventorysystem.models.BorrowRecord;
 import inventorysystem.utils.DatabaseConnection;
 
 import java.sql.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BorrowRecordDAO {
 
-    // -------------------------
-    // NEW METHODS FOR WORKFLOW
-    // -------------------------
-
-    // Quick insert when borrowing an item from popup
+    // Quick insert when borrowing an item
     public boolean insertBorrow(int itemId, int borrowerId) {
         String sql = "INSERT INTO borrow_records (item_id, borrower_id, status) VALUES (?, ?, 'Borrowed')";
 
@@ -34,7 +30,7 @@ public class BorrowRecordDAO {
         return false;
     }
 
-    // Update item status when borrowed
+    // Update item status
     public void updateItemStatusToBorrowed(int itemId) {
         String sql = "UPDATE items SET status='Borrowed' WHERE item_id=?";
 
@@ -49,7 +45,7 @@ public class BorrowRecordDAO {
         }
     }
 
-    // Get borrow history for a specific item
+    // Borrow records by item
     public List<BorrowRecord> getBorrowRecordsByItemId(int itemId) {
         List<BorrowRecord> list = new ArrayList<>();
 
@@ -73,15 +69,14 @@ public class BorrowRecordDAO {
                             rs.getInt("record_id"),
                             rs.getInt("item_id"),
                             rs.getInt("borrower_id"),
-                            rs.getTimestamp("borrow_date").toLocalDateTime().toLocalDate(),
+                            rs.getTimestamp("borrow_date").toLocalDateTime(),
                             rs.getTimestamp("return_date") != null ?
-                                    rs.getTimestamp("return_date").toLocalDateTime().toLocalDate() : null,
-                            rs.getString("status")
+                                    rs.getTimestamp("return_date").toLocalDateTime() : null,
+                            rs.getString("status"),
+                            rs.getString("remarks")
                     );
 
-                    // Add borrower name to record (must exist in model)
                     record.setBorrowerName(rs.getString("borrower_name"));
-
                     list.add(record);
                 }
             }
@@ -93,28 +88,26 @@ public class BorrowRecordDAO {
         return list;
     }
 
-    // --------------------------------------------------
-    // ORIGINAL METHODS (KEPT INTACT, ALREADY WORKING)
-    // --------------------------------------------------
-
-    // Insert a full borrow record (used in other parts of your system)
+    // Insert a full borrow record
     public void addBorrowRecord(BorrowRecord record) {
-        String sql = "INSERT INTO borrow_records (item_id, borrower_id, borrow_date, return_date, status) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO borrow_records (item_id, borrower_id, borrow_date, return_date, status, remarks) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, record.getItemId());
             stmt.setInt(2, record.getBorrowerId());
-            stmt.setDate(3, Date.valueOf(record.getBorrowDate()));
+            stmt.setTimestamp(3, Timestamp.valueOf(record.getBorrowDate()));
 
             if (record.getReturnDate() != null) {
-                stmt.setDate(4, Date.valueOf(record.getReturnDate()));
+                stmt.setTimestamp(4, Timestamp.valueOf(record.getReturnDate()));
             } else {
-                stmt.setNull(4, Types.DATE);
+                stmt.setNull(4, Types.TIMESTAMP);
             }
 
             stmt.setString(5, record.getStatus());
+            stmt.setString(6, record.getRemarks());
+
             stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -136,9 +129,11 @@ public class BorrowRecordDAO {
                         rs.getInt("record_id"),
                         rs.getInt("item_id"),
                         rs.getInt("borrower_id"),
-                        rs.getDate("borrow_date").toLocalDate(),
-                        rs.getDate("return_date") != null ? rs.getDate("return_date").toLocalDate() : null,
-                        rs.getString("status")
+                        rs.getTimestamp("borrow_date").toLocalDateTime(),
+                        rs.getTimestamp("return_date") != null ?
+                                rs.getTimestamp("return_date").toLocalDateTime() : null,
+                        rs.getString("status"),
+                        rs.getString("remarks")
                 );
 
                 list.add(r);
@@ -151,7 +146,7 @@ public class BorrowRecordDAO {
         return list;
     }
 
-    // Get a borrow record by ID
+    // Get one record by ID
     public BorrowRecord getBorrowRecordById(int id) {
         String sql = "SELECT * FROM borrow_records WHERE record_id=?";
 
@@ -167,10 +162,11 @@ public class BorrowRecordDAO {
                             rs.getInt("record_id"),
                             rs.getInt("item_id"),
                             rs.getInt("borrower_id"),
-                            rs.getDate("borrow_date").toLocalDate(),
-                            rs.getDate("return_date") != null ?
-                                    rs.getDate("return_date").toLocalDate() : null,
-                            rs.getString("status")
+                            rs.getTimestamp("borrow_date").toLocalDateTime(),
+                            rs.getTimestamp("return_date") != null ?
+                                    rs.getTimestamp("return_date").toLocalDateTime() : null,
+                            rs.getString("status"),
+                            rs.getString("remarks")
                     );
                 }
 
@@ -183,25 +179,26 @@ public class BorrowRecordDAO {
         return null;
     }
 
-    // Update a borrow record fully
+    // Update full record
     public void updateBorrowRecord(BorrowRecord record) {
-        String sql = "UPDATE borrow_records SET item_id=?, borrower_id=?, borrow_date=?, return_date=?, status=? WHERE record_id=?";
+        String sql = "UPDATE borrow_records SET item_id=?, borrower_id=?, borrow_date=?, return_date=?, status=?, remarks=? WHERE record_id=?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, record.getItemId());
             stmt.setInt(2, record.getBorrowerId());
-            stmt.setDate(3, Date.valueOf(record.getBorrowDate()));
+            stmt.setTimestamp(3, Timestamp.valueOf(record.getBorrowDate()));
 
             if (record.getReturnDate() != null) {
-                stmt.setDate(4, Date.valueOf(record.getReturnDate()));
+                stmt.setTimestamp(4, Timestamp.valueOf(record.getReturnDate()));
             } else {
-                stmt.setNull(4, Types.DATE);
+                stmt.setNull(4, Types.TIMESTAMP);
             }
 
             stmt.setString(5, record.getStatus());
-            stmt.setInt(6, record.getRecordId());
+            stmt.setString(6, record.getRemarks());
+            stmt.setInt(7, record.getRecordId());
 
             stmt.executeUpdate();
 
@@ -210,7 +207,7 @@ public class BorrowRecordDAO {
         }
     }
 
-    // Delete a borrow record
+    // Delete
     public void deleteBorrowRecord(int id) {
         String sql = "DELETE FROM borrow_records WHERE record_id=?";
 
@@ -225,7 +222,7 @@ public class BorrowRecordDAO {
         }
     }
 
-    // Get borrow records by borrower
+    // Borrow records by borrower
     public List<BorrowRecord> getBorrowRecordsByBorrower(int borrowerId) {
         List<BorrowRecord> list = new ArrayList<>();
         String sql = "SELECT * FROM borrow_records WHERE borrower_id=?";
@@ -241,9 +238,11 @@ public class BorrowRecordDAO {
                             rs.getInt("record_id"),
                             rs.getInt("item_id"),
                             rs.getInt("borrower_id"),
-                            rs.getDate("borrow_date").toLocalDate(),
-                            rs.getDate("return_date") != null ? rs.getDate("return_date").toLocalDate() : null,
-                            rs.getString("status")
+                            rs.getTimestamp("borrow_date").toLocalDateTime(),
+                            rs.getTimestamp("return_date") != null ?
+                                    rs.getTimestamp("return_date").toLocalDateTime() : null,
+                            rs.getString("status"),
+                            rs.getString("remarks")
                     );
 
                     list.add(r);
@@ -257,14 +256,14 @@ public class BorrowRecordDAO {
         return list;
     }
 
-    // Mark a borrow as returned
-    public void returnBorrowRecord(int recordId, LocalDate returnDate, String remarks) {
+    // Mark as returned
+    public void returnBorrowRecord(int recordId, LocalDateTime returnDate, String remarks) {
         String sql = "UPDATE borrow_records SET return_date=?, status=?, remarks=? WHERE record_id=?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setDate(1, Date.valueOf(returnDate));
+            stmt.setTimestamp(1, Timestamp.valueOf(returnDate));
             stmt.setString(2, "Returned");
             stmt.setString(3, remarks);
             stmt.setInt(4, recordId);

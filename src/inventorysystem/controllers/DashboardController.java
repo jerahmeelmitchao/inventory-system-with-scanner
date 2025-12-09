@@ -9,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Platform;
@@ -37,42 +36,50 @@ public class DashboardController {
     private Button inchargesBtn;
     @FXML
     private Button logoutBtn;
-
-    private Map<Button, String> buttonFxmlMap;
     @FXML
     private Button scannedItemsBtn;
     @FXML
     private Button ReportsBtn;
 
+    // 🔹 NEW: Borrow Records button
+    @FXML
+    private Button borrowRecordsBtn;
+
+    private Map<Button, String> buttonFxmlMap;
+
+    private StringBuilder barcodeBuffer = new StringBuilder();
+
     public void initialize() {
         // Map buttons to FXML files (ensure these files exist in views/)
         buttonFxmlMap = new HashMap<>();
-        buttonFxmlMap.put(dashboardBtn, "dashboard2.fxml"); // dashboard main content
+        buttonFxmlMap.put(dashboardBtn, "dashboard2.fxml");
         buttonFxmlMap.put(itemsBtn, "items.fxml");
         buttonFxmlMap.put(categoriesBtn, "category.fxml");
         buttonFxmlMap.put(borrowersBtn, "BorrowerManagement.fxml");
         buttonFxmlMap.put(inchargesBtn, "InCharge.fxml");
-        buttonFxmlMap.put(scannedItemsBtn, "scanned_items.fxml"); //
+        buttonFxmlMap.put(scannedItemsBtn, "scanned_items.fxml");
+        // 🔹 NEW: borrow records view
+        buttonFxmlMap.put(borrowRecordsBtn, "borrow_records.fxml");
 
-//        buttonFxmlMap.put(ReportsBtn, "reports.fxml");
         // Add click events
         buttonFxmlMap.keySet().forEach(btn -> btn.setOnAction(e -> loadView(btn)));
-        // ✔ Add logout action
+
+        // Logout
         logoutBtn.setOnAction(e -> handleLogout());
 
         // Load default view
         loadView(dashboardBtn);
+
         Platform.runLater(() -> {
             mainContent.requestFocus();
             setupBarcodeScanner();
         });
-
     }
 
     private void loadView(Button clickedButton) {
-
-        buttonFxmlMap.keySet().forEach(btn
-                -> btn.setStyle(btn == clickedButton
+        // Highlight active button
+        buttonFxmlMap.keySet().forEach(btn ->
+                btn.setStyle(btn == clickedButton
                         ? "-fx-background-color: #2980b9;"
                         : "-fx-background-color: #34495e;")
         );
@@ -84,7 +91,6 @@ public class DashboardController {
             mainContent.getChildren().clear();
             mainContent.getChildren().add(view);
 
-            // 🔥 After loading new view, force focus back so scanner works
             Platform.runLater(() -> mainContent.requestFocus());
 
         } catch (IOException e) {
@@ -92,10 +98,7 @@ public class DashboardController {
         }
     }
 
-    private StringBuilder barcodeBuffer = new StringBuilder();
-
     private void setupBarcodeScanner() {
-
         Scene scene = mainContent.getScene();
         if (scene == null) {
             System.out.println("Scene not ready — scanner not connected yet.");
@@ -103,7 +106,6 @@ public class DashboardController {
         }
 
         scene.setOnKeyPressed(event -> {
-
             String ch = event.getText();
 
             if (ch.matches("[A-Za-z0-9]")) {
@@ -145,7 +147,6 @@ public class DashboardController {
 
             stage.setAlwaysOnTop(true);
             stage.initModality(Modality.APPLICATION_MODAL);
-
             stage.show();
 
         } catch (Exception e) {
@@ -154,7 +155,6 @@ public class DashboardController {
     }
 
     private void handleLogout() {
-
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Logout Confirmation");
         alert.setHeaderText("Are you sure you want to logout?");
@@ -167,7 +167,9 @@ public class DashboardController {
 
                 Stage stage = (Stage) logoutBtn.getScene().getWindow();
                 Scene scene = new Scene(root, 800, 500);
-                scene.getStylesheets().add(getClass().getResource("/inventorysystem/assets/styles.css").toExternalForm());
+                scene.getStylesheets().add(getClass()
+                        .getResource("/inventorysystem/assets/styles.css")
+                        .toExternalForm());
 
                 stage.setScene(scene);
                 stage.centerOnScreen();
@@ -177,5 +179,4 @@ public class DashboardController {
             }
         }
     }
-
 }

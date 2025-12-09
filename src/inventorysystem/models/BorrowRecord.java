@@ -2,28 +2,33 @@ package inventorysystem.models;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class BorrowRecord {
 
     private int recordId;
     private int itemId;
     private int borrowerId;
-    private LocalDate borrowDate;
-    private LocalDate returnDate;
+    private LocalDateTime borrowDate;
+    private LocalDateTime returnDate;
     private String status;
 
-    // 🔹 JavaFX properties for TableView
+    // NEW: remarks field
+    private String remarks;
+
+    // JavaFX properties
     private StringProperty borrowerName = new SimpleStringProperty("");
     private StringProperty borrowDateProperty = new SimpleStringProperty("");
     private StringProperty returnDateProperty = new SimpleStringProperty("");
     private StringProperty statusProperty = new SimpleStringProperty("");
+    private StringProperty remarksProperty = new SimpleStringProperty("");
 
-    public BorrowRecord() {
-    }
+    public BorrowRecord() {}
 
+    // ✔ FIXED: Constructor now uses LocalDateTime instead of LocalDate
     public BorrowRecord(int recordId, int itemId, int borrowerId,
-            LocalDate borrowDate, LocalDate returnDate, String status) {
+                        LocalDateTime borrowDate, LocalDateTime returnDate,
+                        String status, String remarks) {
 
         this.recordId = recordId;
         this.itemId = itemId;
@@ -31,96 +36,65 @@ public class BorrowRecord {
         this.borrowDate = borrowDate;
         this.returnDate = returnDate;
         this.status = status;
+        this.remarks = remarks;
 
         // Set JavaFX properties
         this.borrowDateProperty.set(borrowDate != null ? borrowDate.toString() : "");
         this.returnDateProperty.set(returnDate != null ? returnDate.toString() : "");
         this.statusProperty.set(status);
+        this.remarksProperty.set(remarks != null ? remarks : "");
     }
 
-    // ----------------------------------------------------
-    // Getters & setters (normal fields)
-    // ----------------------------------------------------
-    public int getRecordId() {
-        return recordId;
-    }
+    // --------------------------------------------
+    // Normal getters & setters
+    // --------------------------------------------
+    public int getRecordId() { return recordId; }
+    public void setRecordId(int recordId) { this.recordId = recordId; }
 
-    public void setRecordId(int recordId) {
-        this.recordId = recordId;
-    }
+    public int getItemId() { return itemId; }
+    public void setItemId(int itemId) { this.itemId = itemId; }
 
-    public int getItemId() {
-        return itemId;
-    }
+    public int getBorrowerId() { return borrowerId; }
+    public void setBorrowerId(int borrowerId) { this.borrowerId = borrowerId; }
 
-    public void setItemId(int itemId) {
-        this.itemId = itemId;
-    }
-
-    public int getBorrowerId() {
-        return borrowerId;
-    }
-
-    public void setBorrowerId(int borrowerId) {
-        this.borrowerId = borrowerId;
-    }
-
-    public LocalDate getBorrowDate() {
-        return borrowDate;
-    }
-
-    public void setBorrowDate(LocalDate borrowDate) {
+    // ✔ FIXED: return LocalDateTime
+    public LocalDateTime getBorrowDate() { return borrowDate; }
+    public void setBorrowDate(LocalDateTime borrowDate) {
         this.borrowDate = borrowDate;
         this.borrowDateProperty.set(borrowDate != null ? borrowDate.toString() : "");
     }
 
-    public LocalDate getReturnDate() {
-        return returnDate;
-    }
-
-    public void setReturnDate(LocalDate returnDate) {
+    // ✔ FIXED: return LocalDateTime
+    public LocalDateTime getReturnDate() { return returnDate; }
+    public void setReturnDate(LocalDateTime returnDate) {
         this.returnDate = returnDate;
         this.returnDateProperty.set(returnDate != null ? returnDate.toString() : "");
     }
 
-    public String getStatus() {
-        return status;
-    }
-
+    public String getStatus() { return status; }
     public void setStatus(String status) {
         this.status = status;
         this.statusProperty.set(status);
     }
 
-    // ----------------------------------------------------
-    // Borrower Name (used in the pop-up TableView)
-    // ----------------------------------------------------
-    public String getBorrowerName() {
-        return borrowerName.get();
+    // REMARKS
+    public String getRemarks() { return remarks; }
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+        this.remarksProperty.set(remarks != null ? remarks : "");
     }
 
-    public void setBorrowerName(String name) {
-        borrowerName.set(name);
-    }
+    // --------------------------------------------
+    // JavaFX Properties
+    // --------------------------------------------
+    public String getBorrowerName() { return borrowerName.get(); }
+    public void setBorrowerName(String name) { borrowerName.set(name); }
+    public StringProperty borrowerNameProperty() { return borrowerName; }
 
-    public StringProperty borrowerNameProperty() {
-        return borrowerName;
-    }
-
-    // ----------------------------------------------------
-    // JavaFX Properties used by your TableView columns
-    // ----------------------------------------------------
-    public StringProperty borrowDateProperty() {
-        return borrowDateProperty;
-    }
-
-    public StringProperty returnDateProperty() {
-        return returnDateProperty;
-    }
-
-    public StringProperty statusProperty() {
-        return statusProperty;
-    }
+    public StringProperty borrowDateProperty() { return borrowDateProperty; }
+    public StringProperty returnDateProperty() { return returnDateProperty; }
+    public StringProperty statusProperty() { return statusProperty; }
+    public StringProperty remarksProperty() { return remarksProperty; }
 
     @Override
     public String toString() {
@@ -130,6 +104,7 @@ public class BorrowRecord {
                 + " | BorrowDate: " + borrowDate
                 + " | ReturnDate: " + returnDate
                 + " | Status: " + status
+                + " | Remarks: " + remarks
                 + " | BorrowerName: " + getBorrowerName();
     }
 }
