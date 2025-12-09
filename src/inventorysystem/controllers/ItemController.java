@@ -1420,6 +1420,11 @@ public class ItemController {
 
             Stage stage = new Stage();
             stage.setTitle("Item Details");
+            // 🔥 FIX: Prevent the window from stretching vertically
+            stage.setMaxHeight(850);
+            stage.setMinHeight(850);
+            stage.setMaxWidth(650);
+            stage.setMinWidth(650);
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
             stage.showAndWait();

@@ -7,133 +7,134 @@
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="inventorysystem.controllers.ItemDetailsController"
-      spacing="20"
-      style="-fx-background-color: white; -fx-padding: 25;">
+      spacing="14"
+      style="-fx-background-color: white; -fx-padding: 18;"
+      prefHeight="1100">
 
     <!-- Header -->
-    <HBox spacing="10" alignment="CENTER_LEFT">
+    <HBox spacing="8" alignment="CENTER_LEFT">
         <Label text="📝"
-               style="-fx-font-size: 42;"/>
+               style="-fx-font-size: 36;"/>
         <Label text="Item Information"
-               style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+               style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
     </HBox>
 
     <!-- TABLE CARD -->
     <VBox spacing="0"
           style="-fx-background-color: #ffffff;
                  -fx-border-color: #d1d5db;
-                 -fx-border-radius: 10;
-                 -fx-background-radius: 10;
-                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3);">
+                 -fx-border-radius: 8;
+                 -fx-background-radius: 8;
+                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
 
         <!-- HEADER ROW -->
-        <HBox style="-fx-background-color: #f3f4f6; -fx-padding: 14;">
+        <HBox style="-fx-background-color: #f3f4f6; -fx-padding: 10;">
             <Label text="Field"
-                   style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #4b5563; -fx-pref-width: 170;"/>
+                   style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #4b5563; -fx-pref-width: 160;"/>
             <Label text="Value"
-                   style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #4b5563;"/>
+                   style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #4b5563;"/>
         </HBox>
 
         <!-- Item ID -->
-        <HBox style="-fx-padding: 14;">
+        <HBox style="-fx-padding: 10;">
             <Label text="Item ID:"
-                   style="-fx-font-size: 15; -fx-pref-width: 170; -fx-text-fill: #374151;"/>
-            <Label fx:id="lblItemId" style="-fx-font-size: 15; -fx-text-fill: #1f2937;"/>
+                   style="-fx-font-size: 14; -fx-pref-width: 160; -fx-text-fill: #374151;"/>
+            <Label fx:id="lblItemId" style="-fx-font-size: 14; -fx-text-fill: #1f2937;"/>
         </HBox>
 
         <!-- Item Name -->
-        <HBox style="-fx-background-color: #f9fafb; -fx-padding: 14;">
+        <HBox style="-fx-background-color: #f9fafb; -fx-padding: 10;">
             <Label text="Item Name:"
-                   style="-fx-font-size: 15; -fx-pref-width: 170; -fx-text-fill: #374151;"/>
-            <Label fx:id="lblName" style="-fx-font-size: 15; -fx-text-fill: #1f2937;"/>
+                   style="-fx-font-size: 14; -fx-pref-width: 160; -fx-text-fill: #374151;"/>
+            <Label fx:id="lblName" style="-fx-font-size: 14; -fx-text-fill: #1f2937;"/>
         </HBox>
 
         <!-- Barcode -->
-        <HBox style="-fx-padding: 14;">
+        <HBox style="-fx-padding: 10;">
             <Label text="Barcode:"
-                   style="-fx-font-size: 15; -fx-pref-width: 170; -fx-text-fill: #374151;"/>
-            <Label fx:id="lblBarcode" style="-fx-font-size: 15; -fx-text-fill: #1f2937;"/>
+                   style="-fx-font-size: 14; -fx-pref-width: 160; -fx-text-fill: #374151;"/>
+            <Label fx:id="lblBarcode" style="-fx-font-size: 14; -fx-text-fill: #1f2937;"/>
         </HBox>
 
         <!-- Category -->
-        <HBox style="-fx-background-color: #f9fafb; -fx-padding: 14;">
+        <HBox style="-fx-background-color: #f9fafb; -fx-padding: 10;">
             <Label text="Category:"
-                   style="-fx-font-size: 15; -fx-pref-width: 170; -fx-text-fill: #374151;"/>
-            <Label fx:id="lblCategory" style="-fx-font-size: 15; -fx-text-fill: #1f2937;"/>
+                   style="-fx-font-size: 14; -fx-pref-width: 160; -fx-text-fill: #374151;"/>
+            <Label fx:id="lblCategory" style="-fx-font-size: 14; -fx-text-fill: #1f2937;"/>
         </HBox>
 
         <!-- Unit -->
-        <HBox style="-fx-padding: 14;">
+        <HBox style="-fx-padding: 10;">
             <Label text="Unit:"
-                   style="-fx-font-size: 15; -fx-pref-width: 170; -fx-text-fill: #374151;"/>
-            <Label fx:id="lblUnit" style="-fx-font-size: 15; -fx-text-fill: #1f2937;"/>
+                   style="-fx-font-size: 14; -fx-pref-width: 160; -fx-text-fill: #374151;"/>
+            <Label fx:id="lblUnit" style="-fx-font-size: 14; -fx-text-fill: #1f2937;"/>
         </HBox>
 
         <!-- Status -->
-        <HBox style="-fx-background-color: #f9fafb; -fx-padding: 14;">
+        <HBox style="-fx-background-color: #f9fafb; -fx-padding: 10;">
             <Label text="Status:"
-                   style="-fx-font-size: 15; -fx-pref-width: 170; -fx-text-fill: #374151;"/>
-            <Label fx:id="lblStatus" style="-fx-font-size: 15; -fx-text-fill: #1f2937;"/>
+                   style="-fx-font-size: 14; -fx-pref-width: 160; -fx-text-fill: #374151;"/>
+            <Label fx:id="lblStatus" style="-fx-font-size: 14; -fx-text-fill: #1f2937;"/>
         </HBox>
 
         <!-- Added By -->
-        <HBox style="-fx-padding: 14;">
+        <HBox style="-fx-padding: 10;">
             <Label text="Added By:"
-                   style="-fx-font-size: 15; -fx-pref-width: 170; -fx-text-fill: #374151;"/>
-            <Label fx:id="lblAddedBy" style="-fx-font-size: 15; -fx-text-fill: #1f2937;"/>
+                   style="-fx-font-size: 14; -fx-pref-width: 160; -fx-text-fill: #374151;"/>
+            <Label fx:id="lblAddedBy" style="-fx-font-size: 14; -fx-text-fill: #1f2937;"/>
         </HBox>
 
         <!-- In-Charge -->
-        <HBox style="-fx-background-color: #f9fafb; -fx-padding: 14;">
+        <HBox style="-fx-background-color: #f9fafb; -fx-padding: 10;">
             <Label text="In-Charge:"
-                   style="-fx-font-size: 15; -fx-pref-width: 170; -fx-text-fill: #374151;"/>
-            <Label fx:id="lblInCharge" style="-fx-font-size: 15; -fx-text-fill: #1f2937;"/>
+                   style="-fx-font-size: 14; -fx-pref-width: 160; -fx-text-fill: #374151;"/>
+            <Label fx:id="lblInCharge" style="-fx-font-size: 14; -fx-text-fill: #1f2937;"/>
         </HBox>
 
         <!-- Storage Location -->
-        <HBox style="-fx-padding: 14;">
+        <HBox style="-fx-padding: 10;">
             <Label text="Location:"
-                   style="-fx-font-size: 15; -fx-pref-width: 170; -fx-text-fill: #374151;"/>
-            <Label fx:id="lblLocation" style="-fx-font-size: 15; -fx-text-fill: #1f2937;"/>
+                   style="-fx-font-size: 14; -fx-pref-width: 160; -fx-text-fill: #374151;"/>
+            <Label fx:id="lblLocation" style="-fx-font-size: 14; -fx-text-fill: #1f2937;"/>
         </HBox>
 
         <!-- Date Acquired -->
-        <HBox style="-fx-background-color: #f9fafb; -fx-padding: 14;">
+        <HBox style="-fx-background-color: #f9fafb; -fx-padding: 10;">
             <Label text="Date Acquired:"
-                   style="-fx-font-size: 15; -fx-pref-width: 170; -fx-text-fill: #374151;"/>
-            <Label fx:id="lblDateAcquired" style="-fx-font-size: 15; -fx-text-fill: #1f2937;"/>
+                   style="-fx-font-size: 14; -fx-pref-width: 160; -fx-text-fill: #374151;"/>
+            <Label fx:id="lblDateAcquired" style="-fx-font-size: 14; -fx-text-fill: #1f2937;"/>
         </HBox>
 
         <!-- Last Scanned -->
-        <HBox style="-fx-padding: 14;">
+        <HBox style="-fx-padding: 10;">
             <Label text="Last Scanned:"
-                   style="-fx-font-size: 15; -fx-pref-width: 170; -fx-text-fill: #374151;"/>
-            <Label fx:id="lblLastScan" style="-fx-font-size: 15; -fx-text-fill: #1f2937;"/>
+                   style="-fx-font-size: 14; -fx-pref-width: 160; -fx-text-fill: #374151;"/>
+            <Label fx:id="lblLastScan" style="-fx-font-size: 14; -fx-text-fill: #1f2937;"/>
         </HBox>
 
     </VBox>
 
     <!-- DESCRIPTION CARD -->
-    <VBox spacing="8"
+    <VBox spacing="6"
           style="-fx-background-color: #f7f9fb;
                  -fx-border-color: #d1d5db;
-                 -fx-border-radius: 10;
-                 -fx-background-radius: 10;
-                 -fx-padding: 12;
-                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3);">
+                 -fx-border-radius: 8;
+                 -fx-background-radius: 8;
+                 -fx-padding: 8;
+                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);">
 
         <Label text="Description:"
-               style="-fx-font-size: 17; -fx-font-weight: bold; -fx-text-fill: #374151;"/>
+               style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #374151;"/>
 
         <TextArea fx:id="txtDescription"
                   editable="false"
                   wrapText="true"
-                  prefRowCount="4"
-                  style="-fx-font-size: 15;
+                  prefRowCount="3"
+                  style="-fx-font-size: 14;
                          -fx-background-color: white;
                          -fx-border-color: #cbd5e1;
-                         -fx-padding: 8;
-                         -fx-background-radius: 8;"/>
+                         -fx-padding: 6;
+                         -fx-background-radius: 6;"/>
     </VBox>
 
     <!-- FOOTER -->
@@ -142,9 +143,9 @@
                 onAction="#onClose"
                 style="-fx-background-color: #2563eb;
                        -fx-text-fill: white;
-                       -fx-padding: 10 28;
-                       -fx-background-radius: 8;
-                       -fx-font-size: 15;"/>
+                       -fx-padding: 8 20;
+                       -fx-background-radius: 6;
+                       -fx-font-size: 14;"/>
     </HBox>
 
 </VBox>
