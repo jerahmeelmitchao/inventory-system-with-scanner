@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.UserDAO;
 import inventorysystem.models.User;
 import java.net.URL;
@@ -34,6 +35,10 @@ public class SignUpController implements Initializable {
     @FXML
     private Button signUpBtn;
 
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
     }
@@ -48,8 +53,8 @@ public class SignUpController implements Initializable {
         String confirmPassword = signInConfirmPassword.getText().trim();
 
         // REQUIRED FIELD VALIDATION
-        if (firstName.isEmpty() || lastName.isEmpty() ||
-            username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+        if (firstName.isEmpty() || lastName.isEmpty()
+                || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
 
             showAlert("Error", "All fields are required.");
             return;

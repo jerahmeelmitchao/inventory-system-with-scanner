@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.utils.DatabaseConnection;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -33,10 +34,16 @@ public class ScannedItemsController {
     private final ObservableList<ScannedItem> scannedList = FXCollections.observableArrayList();
     private final DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
 
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
+
     @FXML
     public void initialize() {
 
         colItemName.setCellValueFactory(data -> data.getValue().itemNameProperty());
+
+        // Format scan date to human readable
         colScanDate.setCellValueFactory(data -> {
             String raw = data.getValue().getScanDate();
             String formatted = raw;
@@ -51,6 +58,9 @@ public class ScannedItemsController {
         });
 
         tableScannedItems.setItems(scannedList);
+
+        // 🔥 Load all scanned items when page opens
+        loadAllScannedItems();
     }
 
     @FXML
@@ -70,7 +80,7 @@ public class ScannedItemsController {
         scannedList.clear();
 
         String sql = """
-            SELECT i.item_name, s.scan_date
+            SELECT s.item_id, i.item_name, s.scan_date
             FROM scan_log s
             JOIN items i ON s.item_id = i.item_id
             WHERE DATE(s.scan_date) BETWEEN ? AND ?
@@ -81,6 +91,32 @@ public class ScannedItemsController {
 
             ps.setDate(1, Date.valueOf(start));
             ps.setDate(2, Date.valueOf(end));
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                scannedList.add(new ScannedItem(
+                        rs.getInt("item_id"),
+                        rs.getString("item_name"),
+                        rs.getString("scan_date")
+                ));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadAllScannedItems() {
+        scannedList.clear();
+
+        String sql = """
+            SELECT s.item_id, i.item_name, s.scan_date
+            FROM scan_log s
+            JOIN items i ON s.item_id = i.item_id
+            ORDER BY s.scan_date DESC
+        """;
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -107,8 +143,6 @@ public class ScannedItemsController {
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/inventorysystem/views/item_details.fxml"));
-
-            // FIX: Use Parent, not AnchorPane
             Parent root = loader.load();
 
             ItemDetailsController controller = loader.getController();
@@ -126,7 +160,9 @@ public class ScannedItemsController {
         }
     }
 
-    // Data model for the table
+    // ===============================
+    // UI Table Row Model
+    // ===============================
     public static class ScannedItem {
 
         private final int itemId;
@@ -158,7 +194,5 @@ public class ScannedItemsController {
         public SimpleStringProperty scanDateProperty() {
             return scanDate;
         }
-
     }
-
 }

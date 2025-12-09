@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.BorrowerDAO;
 import inventorysystem.dao.BorrowRecordDAO;
 import inventorysystem.dao.ItemDAO;
@@ -69,6 +70,10 @@ public class BorrowerController {
     private ObservableList<Borrower> borrowerList;
     private Borrower selectedBorrower;
 
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
+
     // -----------------------------------------
     // INITIALIZE
     // -----------------------------------------
@@ -129,7 +134,6 @@ public class BorrowerController {
 //        filterTypeCombo.setValue("All");
 
 //        filterPositionCombo.setValue("All");
-
         searchField.textProperty().addListener((a, b, c) -> applyFilters());
         filterTypeCombo.valueProperty().addListener((a, b, c) -> applyFilters());
         filterPositionCombo.valueProperty().addListener((a, b, c) -> applyFilters());
@@ -231,7 +235,6 @@ public class BorrowerController {
                     borrowerList.remove(selectedBorrower);
                     populatePositionFilter();
                     handleCancel();
-
                     showAlert("Success", "Borrower deleted successfully.");
                 }
             }

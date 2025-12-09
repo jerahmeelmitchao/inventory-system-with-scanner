@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.CategoryDAO;
 import inventorysystem.dao.InchargeDAO;
 import inventorysystem.models.Incharge;
@@ -31,6 +32,10 @@ public class InChargeFormController {
     private Map<String, Integer> categories = new HashMap<>();
     private Incharge currentIncharge = null;
     private Runnable onSaveCallback;
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     @FXML
     public void initialize() {
@@ -66,7 +71,9 @@ public class InChargeFormController {
     @FXML
     private void handleSave() {
 
-        if (!validate()) return;
+        if (!validate()) {
+            return;
+        }
 
         if (currentIncharge == null) {
             currentIncharge = new Incharge();
@@ -83,7 +90,9 @@ public class InChargeFormController {
             dao.updateIncharge(currentIncharge);
         }
 
-        if (onSaveCallback != null) onSaveCallback.run();
+        if (onSaveCallback != null) {
+            onSaveCallback.run();
+        }
 
         close();
     }
@@ -93,10 +102,10 @@ public class InChargeFormController {
     }
 
     private boolean validate() {
-        if (nameField.getText().isEmpty() ||
-            positionField.getText().isEmpty() ||
-            contactField.getText().isEmpty() ||
-            categoryComboBox.getValue() == null) {
+        if (nameField.getText().isEmpty()
+                || positionField.getText().isEmpty()
+                || contactField.getText().isEmpty()
+                || categoryComboBox.getValue() == null) {
 
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setContentText("Please fill all fields.");

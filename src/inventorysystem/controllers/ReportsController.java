@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.ItemDAO;
 import inventorysystem.models.Item;
 import javafx.fxml.FXML;
@@ -15,11 +16,16 @@ import java.util.List;
 
 public class ReportsController {
 
-    @FXML private Button exportAllBtn;
-    @FXML private Button exportBorrowedBtn;
-    @FXML private Button exportMissingBtn;
-    @FXML private Button exportDamagedBtn;
-    @FXML private Button exportBorrowersBtn;
+    @FXML
+    private Button exportAllBtn;
+    @FXML
+    private Button exportBorrowedBtn;
+    @FXML
+    private Button exportMissingBtn;
+    @FXML
+    private Button exportDamagedBtn;
+    @FXML
+    private Button exportBorrowersBtn;
 
     // Use the same formatter you used elsewhere (keeps consistency)
     private final DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -27,14 +33,18 @@ public class ReportsController {
     // DAO instances (you already have ItemDAO in your project)
     private final ItemDAO itemDAO = new ItemDAO();
 
-    /***********************************************************
-     * NOTE:
-     * - This controller prefers using existing DAOs / model lists.
-     * - For borrowed/borrowers report your project may have
-     *   BorrowRecordDAO / BorrowerDAO. If so, replace the stub
-     *   sections with those DAO calls (see comments below).
-     ***********************************************************/
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
+    /**
+     * *********************************************************
+     * NOTE: - This controller prefers using existing DAOs / model lists. - For
+     * borrowed/borrowers report your project may have BorrowRecordDAO /
+     * BorrowerDAO. If so, replace the stub sections with those DAO calls (see
+     * comments below).
+     **********************************************************
+     */
     // ---------- Export helpers ----------
     private File chooseSaveFile(String suggestedName) {
         FileChooser fc = new FileChooser();
@@ -46,12 +56,16 @@ public class ReportsController {
 
     private void writeCsv(File file, List<String> lines) throws Exception {
         try (PrintWriter pw = new PrintWriter(file)) {
-            for (String line : lines) pw.println(line);
+            for (String line : lines) {
+                pw.println(line);
+            }
         }
     }
 
     private String safe(String s) {
-        if (s == null) return "";
+        if (s == null) {
+            return "";
+        }
         // replace CR/LF and commas (basic escaping)
         return s.replace("\r", " ").replace("\n", " ").replace(",", " ");
     }
@@ -61,11 +75,12 @@ public class ReportsController {
     }
 
     // ---------- Exports ----------
-
     @FXML
     private void exportAllItems() {
         File f = chooseSaveFile("all_items.csv");
-        if (f == null) return;
+        if (f == null) {
+            return;
+        }
 
         try {
             List<Item> items = itemDAO.getAllItems(); // uses DAO (in-memory / DB depending on your DAO)
@@ -105,7 +120,9 @@ public class ReportsController {
         // If you have BorrowRecordDAO in your project, use it here.
         // Below is a fallback if you don't: we attempt to use ItemDAO to filter status 'Borrowed'
         File f = chooseSaveFile("borrowed_items.csv");
-        if (f == null) return;
+        if (f == null) {
+            return;
+        }
 
         try {
             // Prefer borrow-records source if exists
@@ -131,7 +148,7 @@ public class ReportsController {
                             "", // borrower name
                             "", // borrow date
                             "", // return date
-                            ""  // remarks
+                            "" // remarks
                     ));
                 }
             }
@@ -147,7 +164,9 @@ public class ReportsController {
     @FXML
     private void exportMissingItems() {
         File f = chooseSaveFile("missing_items.csv");
-        if (f == null) return;
+        if (f == null) {
+            return;
+        }
 
         try {
             List<Item> items = itemDAO.getAllItems();
@@ -180,7 +199,9 @@ public class ReportsController {
     @FXML
     private void exportDamagedItems() {
         File f = chooseSaveFile("damaged_items.csv");
-        if (f == null) return;
+        if (f == null) {
+            return;
+        }
 
         try {
             List<Item> items = itemDAO.getAllItems();
@@ -214,7 +235,9 @@ public class ReportsController {
     @FXML
     private void exportBorrowers() {
         File f = chooseSaveFile("borrowers_report.csv");
-        if (f == null) return;
+        if (f == null) {
+            return;
+        }
 
         try {
             // If you have a BorrowerDAO, use it. For now we assume borrowers table exists and you have a DAO.

@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.utils.DatabaseConnection;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -7,7 +8,6 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +39,10 @@ public class UpdateItemController {
 
     private final Map<String, Integer> inChargeMap = new HashMap<>();
     private int editingId = -1;
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     @FXML
     public void initialize() {
@@ -138,6 +142,7 @@ public class UpdateItemController {
             ps.executeUpdate();
 
             showInfo("Success", "Item updated successfully!");
+            AuditLogDAO.log(addedByField.toString(), "UPDATE_ITEM", "Updated item ID: " + editingId);
             closeWindow();
 
         } catch (Exception e) {

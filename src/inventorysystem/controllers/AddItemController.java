@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.utils.DatabaseConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -36,8 +37,6 @@ public class AddItemController {
     @FXML
     private TextField addedByField; // auto username
     @FXML
-    private Button saveButton;
-    @FXML
     private Button cancelButton;
 
     private final ObservableList<String> categories = FXCollections.observableArrayList();
@@ -45,6 +44,10 @@ public class AddItemController {
     private final Map<String, Integer> inChargeMap = new HashMap<>();
 
     private static final SecureRandom RANDOM = new SecureRandom();
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     @FXML
     public void initialize() {
@@ -162,6 +165,7 @@ public class AddItemController {
         }
 
         saveNewItem(name, categoryId, unit, dateAcquired, status, location, inChargeId, addedBy, description);
+        
     }
 
     private Integer getCategoryId(String name) {
@@ -206,6 +210,7 @@ public class AddItemController {
             ps.executeUpdate();
 
             showInfo("Success", "Item added successfully!\nGenerated Barcode: " + barcode);
+            AuditLogDAO.log(addedBy, "ADD_ITEM", "Added item: " + name);
             clearForm();
 
         } catch (SQLException e) {

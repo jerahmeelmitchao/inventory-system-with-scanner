@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.CategoryDAO;
 import inventorysystem.models.Category;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -44,6 +45,10 @@ public class CategoryController {
     private ObservableList<Category> pageList = FXCollections.observableArrayList();
     private final CategoryDAO categoryDAO = new CategoryDAO();
     private ObservableList<Category> categoryList;
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     @FXML
     public void initialize() {

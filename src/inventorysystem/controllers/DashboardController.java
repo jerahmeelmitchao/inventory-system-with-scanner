@@ -1,7 +1,9 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.ItemDAO;
 import inventorysystem.models.Item;
+import inventorysystem.models.ScanLogModel;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -78,8 +80,8 @@ public class DashboardController {
 
     private void loadView(Button clickedButton) {
         // Highlight active button
-        buttonFxmlMap.keySet().forEach(btn ->
-                btn.setStyle(btn == clickedButton
+        buttonFxmlMap.keySet().forEach(btn
+                -> btn.setStyle(btn == clickedButton
                         ? "-fx-background-color: #2980b9;"
                         : "-fx-background-color: #34495e;")
         );
@@ -127,6 +129,7 @@ public class DashboardController {
         Item item = dao.getItemByBarcode(barcode);
 
         if (item != null) {
+            ScanLogModel.logScan(item.getItemId());
             showScanPopup(item);
         } else {
             System.out.println("Item not found. Barcode: " + barcode);
@@ -161,6 +164,7 @@ public class DashboardController {
         alert.setContentText("You will be returned to the login screen.");
 
         if (alert.showAndWait().get() == ButtonType.OK) {
+            AuditLogDAO.log(ItemController.getLoggedUsername(), "LOGOUT", "User logged out");
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/inventorysystem/views/login.fxml"));
                 Parent root = loader.load();

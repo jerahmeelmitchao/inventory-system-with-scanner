@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.utils.DatabaseConnection;
 import javafx.fxml.FXML;
 import javafx.scene.chart.*;
@@ -15,6 +16,10 @@ public class Dashboard2Controller {
     private GridPane chartContainer;
     @FXML
     private Label lblTotalItems, lblLowStock, lblDamaged, lblUnscanned;
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     @FXML
     public void initialize() {
@@ -41,16 +46,15 @@ public class Dashboard2Controller {
             """;
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        try (PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 series.getData().add(new XYChart.Data<>(rs.getString("category_name"), rs.getInt("total")));
             }
         }
 
-        BarChart<String, Number> barChart =
-                new BarChart<>(new CategoryAxis(), new NumberAxis());
+        BarChart<String, Number> barChart
+                = new BarChart<>(new CategoryAxis(), new NumberAxis());
         barChart.setTitle("Items per Category");
         barChart.getData().add(series);
         barChart.setPrefSize(500, 300);
@@ -70,16 +74,15 @@ public class Dashboard2Controller {
             """;
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        try (PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 series.getData().add(new XYChart.Data<>(rs.getString("item_name"), rs.getInt("scans")));
             }
         }
 
-        BarChart<String, Number> barChart =
-                new BarChart<>(new CategoryAxis(), new NumberAxis());
+        BarChart<String, Number> barChart
+                = new BarChart<>(new CategoryAxis(), new NumberAxis());
         barChart.setTitle("Top 5 Most Scanned Items (This Month)");
         barChart.getData().add(series);
         barChart.setPrefSize(500, 300);
@@ -96,8 +99,7 @@ public class Dashboard2Controller {
             """;
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        try (PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 int m = rs.getInt("month_num");
@@ -105,8 +107,8 @@ public class Dashboard2Controller {
             }
         }
 
-        LineChart<String, Number> lineChart =
-                new LineChart<>(new CategoryAxis(), new NumberAxis());
+        LineChart<String, Number> lineChart
+                = new LineChart<>(new CategoryAxis(), new NumberAxis());
         lineChart.setTitle("Items Added per Month");
         lineChart.getData().add(series);
         lineChart.setPrefSize(1020, 300);
@@ -135,8 +137,7 @@ public class Dashboard2Controller {
     }
 
     private int count(Connection conn, String sql) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             if (rs.next()) {
                 return rs.getInt(1);

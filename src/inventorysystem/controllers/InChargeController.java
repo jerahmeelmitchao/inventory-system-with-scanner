@@ -1,8 +1,8 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.CategoryDAO;
 import inventorysystem.dao.InchargeDAO;
-import inventorysystem.models.Category;
 import inventorysystem.models.Incharge;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -39,21 +39,25 @@ public class InChargeController {
 
     private Map<Integer, String> categoryMap;  // id -> name
 
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
+
     @FXML
     public void initialize() {
 
         // Load categories
         categoryMap = new HashMap<>();
-        categoryDAO.getAllCategories().forEach(cat ->
-                categoryMap.put(cat.getCategoryId(), cat.getCategoryName()));
+        categoryDAO.getAllCategories().forEach(cat
+                -> categoryMap.put(cat.getCategoryId(), cat.getCategoryName()));
 
         // Bind column data
         colId.setCellValueFactory(cd -> new SimpleIntegerProperty(cd.getValue().getInchargeId()).asObject());
         colName.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getInchargeName()));
         colPosition.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getPosition()));
         colContact.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getContactInfo()));
-        colAssignedCategory.setCellValueFactory(cd -> 
-                new SimpleStringProperty(categoryMap.getOrDefault(cd.getValue().getAssignedCategoryId(), "None")));
+        colAssignedCategory.setCellValueFactory(cd
+                -> new SimpleStringProperty(categoryMap.getOrDefault(cd.getValue().getAssignedCategoryId(), "None")));
 
         loadIncharges();
 
@@ -78,7 +82,9 @@ public class InChargeController {
     @FXML
     private void openEditPopup() {
         Incharge selected = inchargeTable.getSelectionModel().getSelectedItem();
-        if (selected != null) openFormPopup(selected);
+        if (selected != null) {
+            openFormPopup(selected);
+        }
     }
 
     private void openFormPopup(Incharge incharge) {
@@ -103,7 +109,9 @@ public class InChargeController {
     @FXML
     private void handleDelete() {
         Incharge selected = inchargeTable.getSelectionModel().getSelectedItem();
-        if (selected == null) return;
+        if (selected == null) {
+            return;
+        }
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
                 "Are you sure you want to delete " + selected.getInchargeName() + "?",

@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.BorrowRecordDAO;
 import inventorysystem.dao.ItemDAO;
 import inventorysystem.dao.BorrowerDAO;
@@ -26,26 +27,42 @@ import java.time.format.DateTimeFormatter;
 public class BorrowRecordsController {
 
     // ===================== UI Components =====================
-    @FXML private TableView<BorrowRecord> borrowTable;
+    @FXML
+    private TableView<BorrowRecord> borrowTable;
 
-    @FXML private TableColumn<BorrowRecord, Integer> colRecordId; // <== changed to Integer
-    @FXML private TableColumn<BorrowRecord, String> colItemName;
-    @FXML private TableColumn<BorrowRecord, String> colBorrowerName;
-    @FXML private TableColumn<BorrowRecord, String> colBorrowDate;
-    @FXML private TableColumn<BorrowRecord, String> colReturnDate;
-    @FXML private TableColumn<BorrowRecord, String> colStatus;
-    @FXML private TableColumn<BorrowRecord, String> colRemarks;
+    @FXML
+    private TableColumn<BorrowRecord, Integer> colRecordId; // <== changed to Integer
+    @FXML
+    private TableColumn<BorrowRecord, String> colItemName;
+    @FXML
+    private TableColumn<BorrowRecord, String> colBorrowerName;
+    @FXML
+    private TableColumn<BorrowRecord, String> colBorrowDate;
+    @FXML
+    private TableColumn<BorrowRecord, String> colReturnDate;
+    @FXML
+    private TableColumn<BorrowRecord, String> colStatus;
+    @FXML
+    private TableColumn<BorrowRecord, String> colRemarks;
 
-    @FXML private TextField searchField;
-    @FXML private ComboBox<String> statusFilterCombo;
-    @FXML private Button clearFilterBtn;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private ComboBox<String> statusFilterCombo;
+    @FXML
+    private Button clearFilterBtn;
 
-    @FXML private Button prevPageBtn;
-    @FXML private Button nextPageBtn;
-    @FXML private Label pageInfoLabel;
-    @FXML private ComboBox<Integer> rowsPerPageCombo;
+    @FXML
+    private Button prevPageBtn;
+    @FXML
+    private Button nextPageBtn;
+    @FXML
+    private Label pageInfoLabel;
+    @FXML
+    private ComboBox<Integer> rowsPerPageCombo;
 
-    @FXML private Button viewDetailsBtn;
+    @FXML
+    private Button viewDetailsBtn;
 
     // ===================== DAO + Data Lists =====================
     private final BorrowRecordDAO borrowDAO = new BorrowRecordDAO();
@@ -58,8 +75,12 @@ public class BorrowRecordsController {
     private int currentPage = 1;
     private int rowsPerPage = 10;
 
-    private final DateTimeFormatter formatter =
-            DateTimeFormatter.ofPattern("MMMM dd, yyyy hh:mm a");
+    private final DateTimeFormatter formatter
+            = DateTimeFormatter.ofPattern("MMMM dd, yyyy hh:mm a");
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     // ===================== INITIALIZE =====================
     @FXML
@@ -78,8 +99,8 @@ public class BorrowRecordsController {
     // ===================== SETUP TABLE COLUMNS =====================
     private void setupColumns() {
 
-        colRecordId.setCellValueFactory(c ->
-                new SimpleIntegerProperty(c.getValue().getRecordId()).asObject()
+        colRecordId.setCellValueFactory(c
+                -> new SimpleIntegerProperty(c.getValue().getRecordId()).asObject()
         );
 
         colItemName.setCellValueFactory(c -> {
@@ -95,27 +116,29 @@ public class BorrowRecordsController {
         });
 
         colBorrowDate.setCellValueFactory(c -> {
-            if (c.getValue().getBorrowDate() == null)
+            if (c.getValue().getBorrowDate() == null) {
                 return new javafx.beans.property.SimpleStringProperty("-");
+            }
             return new javafx.beans.property.SimpleStringProperty(
                     c.getValue().getBorrowDate().format(formatter)
             );
         });
 
         colReturnDate.setCellValueFactory(c -> {
-            if (c.getValue().getReturnDate() == null)
+            if (c.getValue().getReturnDate() == null) {
                 return new javafx.beans.property.SimpleStringProperty("-");
+            }
             return new javafx.beans.property.SimpleStringProperty(
                     c.getValue().getReturnDate().format(formatter)
             );
         });
 
-        colStatus.setCellValueFactory(c ->
-                new javafx.beans.property.SimpleStringProperty(c.getValue().getStatus())
+        colStatus.setCellValueFactory(c
+                -> new javafx.beans.property.SimpleStringProperty(c.getValue().getStatus())
         );
 
-        colRemarks.setCellValueFactory(c ->
-                new javafx.beans.property.SimpleStringProperty(
+        colRemarks.setCellValueFactory(c
+                -> new javafx.beans.property.SimpleStringProperty(
                         c.getValue().getRemarks() != null ? c.getValue().getRemarks() : ""
                 )
         );
@@ -158,14 +181,14 @@ public class BorrowRecordsController {
             String itemName = item != null ? item.getItemName().toLowerCase() : "";
             String borrowerName = borrower != null ? borrower.getBorrowerName().toLowerCase() : "";
 
-            boolean matchSearch =
-                    itemName.contains(search)
+            boolean matchSearch
+                    = itemName.contains(search)
                     || borrowerName.contains(search)
                     || record.getStatus().toLowerCase().contains(search)
                     || (record.getRemarks() != null && record.getRemarks().toLowerCase().contains(search));
 
-            boolean matchStatus =
-                    status.equals("All") || record.getStatus().equalsIgnoreCase(status);
+            boolean matchStatus
+                    = status.equals("All") || record.getStatus().equalsIgnoreCase(status);
 
             return matchSearch && matchStatus;
         });
@@ -205,7 +228,9 @@ public class BorrowRecordsController {
         int start = (currentPage - 1) * rowsPerPage;
         int end = Math.min(start + rowsPerPage, filteredList.size());
 
-        if (start > end) start = 0;
+        if (start > end) {
+            start = 0;
+        }
 
         borrowTable.setItems(FXCollections.observableArrayList(filteredList.subList(start, end)));
 

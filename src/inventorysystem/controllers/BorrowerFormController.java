@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.BorrowerDAO;
 import inventorysystem.models.Borrower;
 import javafx.fxml.FXML;
@@ -22,6 +23,10 @@ public class BorrowerFormController {
     private boolean isEdit = false;
 
     private Runnable onSaveCallback;
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     @FXML
     public void initialize() {

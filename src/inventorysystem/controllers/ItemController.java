@@ -29,6 +29,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
+import inventorysystem.dao.AuditLogDAO;
 import java.io.FileOutputStream;
 import java.util.Optional;
 import javafx.scene.control.TextField;
@@ -78,6 +79,10 @@ public class ItemController {
     private static String loggedFirstName = "";
     private static String loggedLastName = "";
     private static int loggedUserId;
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     // Call these from LoginController after login
     public static void setLoggedUser(int id, String username, String first, String last) {
@@ -227,6 +232,7 @@ public class ItemController {
                 try {
                     itemDAO.deleteItem(selected.getItemId());
                     loadItems();
+                    AuditLogDAO.log(ItemController.getLoggedUsername(), "DELETE_ITEM", "Deleted item ID: " + selected.getItemId());
                     showAlert("Success", "Item deleted successfully", "");
                 } catch (Exception e) {
                     showAlert("Error", "Failed to delete item.", e.getMessage());
@@ -775,7 +781,7 @@ public class ItemController {
                 });
             }
         }
-
+        AuditLogDAO.log(ItemController.getLoggedUsername(), "EXPORT_REPORT", "Exported: missing_items.pdf");
         generatePDF("missing_items.pdf", "❓ MISSING ITEMS REPORT", rows.toArray(new String[0][]));
     }
 
@@ -794,7 +800,7 @@ public class ItemController {
                 });
             }
         }
-
+        AuditLogDAO.log(ItemController.getLoggedUsername(), "EXPORT_REPORT", "Exported: damaged_items.pdf");
         generatePDF("damaged_items.pdf", "💢 DAMAGED ITEMS REPORT", rows.toArray(new String[0][]));
     }
 
@@ -815,7 +821,7 @@ public class ItemController {
                     "" + daoClass.getMethod("getBorrowerType").invoke(b)
                 });
             }
-
+            AuditLogDAO.log(ItemController.getLoggedUsername(), "EXPORT_REPORT", "Exported: borrowers.pdf");
             generatePDF("borrowers.pdf", "🧑‍🤝‍🧑 BORROWERS REPORT", rows.toArray(new String[0][]));
 
         } catch (Exception e) {
@@ -948,6 +954,7 @@ public class ItemController {
             }
 
             writeCsv(file, lines);
+            AuditLogDAO.log(ItemController.getLoggedUsername(), "EXPORT_REPORT", "Exported: filtered_items.pdf");
             showAlert("Success", "Export Complete", "Filtered items exported.");
         } catch (Exception e) {
             showAlert("Error", "Export Failed", e.getMessage());
@@ -978,6 +985,7 @@ public class ItemController {
             }
 
             writeCsv(file, lines);
+            AuditLogDAO.log(ItemController.getLoggedUsername(), "EXPORT_REPORT", "Exported: borrowed_items.csv");
             showAlert("Success", "Export Complete", "Borrowed items exported.");
         } catch (Exception e) {
             showAlert("Error", "Export Failed", e.getMessage());
@@ -1008,6 +1016,7 @@ public class ItemController {
             }
 
             writeCsv(file, lines);
+            AuditLogDAO.log(ItemController.getLoggedUsername(), "EXPORT_REPORT", "Exported: missing_items.csv");
             showAlert("Success", "Export Complete", "Missing items exported.");
         } catch (Exception e) {
             showAlert("Error", "Export Failed", e.getMessage());
@@ -1038,6 +1047,7 @@ public class ItemController {
             }
 
             writeCsv(file, lines);
+            AuditLogDAO.log(ItemController.getLoggedUsername(), "EXPORT_REPORT", "Exported: damages_items.csv");
             showAlert("Success", "Export Complete", "Damaged items exported.");
         } catch (Exception e) {
             showAlert("Error", "Export Failed", e.getMessage());
@@ -1068,6 +1078,7 @@ public class ItemController {
             }
 
             writeCsv(file, lines);
+            AuditLogDAO.log(ItemController.getLoggedUsername(), "EXPORT_REPORT", "Exported: borrowers.csv");
             showAlert("Success", "Export Complete", "Borrowers exported.");
 
         } catch (Exception e) {
@@ -1207,7 +1218,7 @@ public class ItemController {
 
             doc.add(table);
             doc.close();
-
+            AuditLogDAO.log(ItemController.getLoggedUsername(), "EXPORT_REPORT", "Exported: barcodes.pdf");
             showAlert("Success", "Export Complete", "Barcodes exported successfully!");
 
         } catch (Exception e) {
@@ -1319,7 +1330,7 @@ public class ItemController {
                 alert.showAndWait();
                 return;
             }
-
+            AuditLogDAO.log(ItemController.getLoggedUsername(), "EXPORT_REPORT", "Exported: barcodes.pdf");
             popup.close();  // close popup FIRST
             exportBarcodesPDF(new ArrayList<>(selected));
         });

@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.models.BorrowRecord;
 import inventorysystem.dao.ItemDAO;
 import inventorysystem.dao.BorrowerDAO;
@@ -16,20 +17,32 @@ import java.time.format.DateTimeFormatter;
 
 public class BorrowRecordDetailsController {
 
-    @FXML private Label lblRecordId;
-    @FXML private Label lblItemName;
-    @FXML private Label lblBorrowerName;
-    @FXML private Label lblBorrowDate;
-    @FXML private Label lblReturnDate;
-    @FXML private Label lblStatus;
-    @FXML private TextArea txtRemarks;
-    @FXML private Button btnClose;
+    @FXML
+    private Label lblRecordId;
+    @FXML
+    private Label lblItemName;
+    @FXML
+    private Label lblBorrowerName;
+    @FXML
+    private Label lblBorrowDate;
+    @FXML
+    private Label lblReturnDate;
+    @FXML
+    private Label lblStatus;
+    @FXML
+    private TextArea txtRemarks;
+    @FXML
+    private Button btnClose;
 
     private final ItemDAO itemDAO = new ItemDAO();
     private final BorrowerDAO borrowerDAO = new BorrowerDAO();
 
-    private final DateTimeFormatter formatter =
-            DateTimeFormatter.ofPattern("MMMM dd, yyyy hh:mm a");
+    private final DateTimeFormatter formatter
+            = DateTimeFormatter.ofPattern("MMMM dd, yyyy hh:mm a");
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     /**
      * Called by BorrowRecordsController after loading the FXML.

@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.ItemDAO;
 import inventorysystem.models.Item;
 
@@ -39,6 +40,10 @@ public class ItemDetailsController {
     private TextArea txtDescription;
 
     private final ItemDAO itemDAO = new ItemDAO();
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     // Human readable formats
     private final DateTimeFormatter dateFormatter

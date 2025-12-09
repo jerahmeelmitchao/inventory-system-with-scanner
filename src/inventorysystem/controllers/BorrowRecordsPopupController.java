@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.BorrowRecordDAO;
 import inventorysystem.models.BorrowRecord;
 
@@ -27,6 +28,10 @@ public class BorrowRecordsPopupController {
     private TableColumn<BorrowRecord, String> colStatus;
 
     private static int itemId;
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     public static void open(int id) {
         itemId = id;

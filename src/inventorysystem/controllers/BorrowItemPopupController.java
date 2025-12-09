@@ -1,10 +1,12 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.BorrowRecordDAO;
 import inventorysystem.dao.BorrowerDAO;
 import inventorysystem.dao.ItemDAO;
 import inventorysystem.models.Borrower;
 import inventorysystem.models.Item;
+import java.io.IOException;
 
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
@@ -58,9 +60,13 @@ public class BorrowItemPopupController {
 
             stage.show();
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
     }
 
     // ------------------------------
