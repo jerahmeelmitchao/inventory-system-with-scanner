@@ -16,11 +16,13 @@
 
     <children>
 
-        <!-- Main horizontal layout -->
+        <!-- Main layout -->
         <HBox prefWidth="800" prefHeight="500">
 
-            <!-- LEFT SIDE -->
-            <AnchorPane styleClass="login-image-panel" prefWidth="400">
+            <!-- LEFT IMAGE PANEL -->
+            <AnchorPane styleClass="login-image-panel"
+                        prefWidth="400"
+                        mouseTransparent="true">
                 <children>
                     <ImageView fitWidth="400" fitHeight="500" preserveRatio="false">
                         <image>
@@ -30,22 +32,30 @@
                 </children>
             </AnchorPane>
 
-            <!-- RIGHT SIDE (Centered VBox) -->
+            <!-- RIGHT PANEL -->
             <StackPane alignment="CENTER" prefWidth="400">
                 <children>
                     <VBox alignment="CENTER" spacing="15" styleClass="login-form">
 
                         <Text text="Login To Continue" styleClass="login-title" />
 
-                        <TextField fx:id="loginUsername" promptText="Username" styleClass="login-field"/>
-                        <PasswordField fx:id="loginPassword" promptText="Password" styleClass="login-field"/>
+                        <TextField fx:id="loginUsername"
+                                   promptText="Username"
+                                   styleClass="login-field"/>
 
-                        <Button fx:id="loginBtn" text="Login" onAction="#login"
+                        <PasswordField fx:id="loginPassword"
+                                       promptText="Password"
+                                       styleClass="login-field"/>
+
+                        <Button fx:id="loginBtn"
+                                text="Login"
+                                onAction="#login"
                                 styleClass="login-btn"/>
 
                         <HBox alignment="CENTER" spacing="5">
                             <Text text="Don't have an account?" />
-                            <Text text="Sign Up" onMouseClicked="#switchToSignUp"
+                            <Text text="Sign Up"
+                                  onMouseClicked="#switchToSignUp"
                                   styleClass="login-link"/>
                         </HBox>
 
@@ -54,6 +64,15 @@
             </StackPane>
 
         </HBox>
+
+        <!-- EXIT ICON (TOP RIGHT CORNER) -->
+       <Label fx:id="exitIcon"
+       text="✖"
+       layoutX="770" layoutY="10"
+       onMouseClicked="#exitApp"
+       pickOnBounds="true"
+       style="-fx-font-size: 22px; -fx-text-fill: #c0392b; -fx-cursor: hand; -fx-font-weight: bold;" />
+
 
     </children>
 

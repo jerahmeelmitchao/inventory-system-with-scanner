@@ -35,12 +35,28 @@
             <Button fx:id="borrowRecordsBtn" text="Borrow Records" prefWidth="160" styleClass="sidebar-btn"/>
             <Button fx:id="inchargesBtn" text="Incharge" prefWidth="160" styleClass="sidebar-btn"/>
             <Button fx:id="scannedItemsBtn" text="Scanned" prefWidth="160" styleClass="sidebar-btn"/>
+            
 
             <!-- Push logout button to bottom -->
             <VBox alignment="BOTTOM_CENTER" spacing="10" VBox.vgrow="ALWAYS">
-                <Button fx:id="logoutBtn" text="Logout" prefWidth="160"
-                        style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-font-weight: bold;">
-                </Button>
+                <HBox alignment="CENTER" spacing="8" style="-fx-background-color: transparent;">
+                    <Button fx:id="logoutBtn" prefWidth="160"
+                            style="
+                -fx-background-color: #e74c3c;
+                -fx-text-fill: white;
+                -fx-background-radius: 8;
+                -fx-padding: 8 12;
+                -fx-font-weight: bold;
+                -fx-font-size: 14px;
+                -fx-cursor: hand;
+            ">
+                        <graphic>
+                            <Label text="⎋" style="-fx-text-fill: white; -fx-font-size: 16px;" />
+                        </graphic>
+                        Logout
+                    </Button>
+                </HBox>
+
             </VBox>
 
         </VBox>

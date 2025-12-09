@@ -4,13 +4,17 @@ import inventorysystem.models.BorrowRecord;
 import inventorysystem.utils.DatabaseConnection;
 
 import java.sql.*;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BorrowRecordDAO {
 
-    // Quick insert when borrowing an item
+    // ---------------------------------------------------------
+    // INSERT BORROW (simple insert when scanning)
+    // ---------------------------------------------------------
     public boolean insertBorrow(int itemId, int borrowerId) {
         String sql = "INSERT INTO borrow_records (item_id, borrower_id, status) VALUES (?, ?, 'Borrowed')";
 
@@ -19,17 +23,165 @@ public class BorrowRecordDAO {
             stmt.setInt(1, itemId);
             stmt.setInt(2, borrowerId);
             stmt.executeUpdate();
-
             return true;
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return false;
     }
 
-    // Update item status
+    // =========================================================
+    // 🔥 DAYS OVERDUE CALCULATOR (Based on 5-day limit)
+    // =========================================================
+    private int calculateDaysOverdue(LocalDateTime borrowDate) {
+        if (borrowDate == null) {
+            return 0;
+        }
+
+        long days = Duration.between(
+                borrowDate.toLocalDate().atStartOfDay(),
+                LocalDate.now().atStartOfDay()
+        ).toDays();
+
+        return days > 5 ? (int) (days - 5) : 0;
+    }
+
+    // =========================================================
+    // GET OVERDUE RECORDS (Over X days)
+    // =========================================================
+    public List<BorrowRecord> getOverdueRecords(int days) {
+        List<BorrowRecord> list = new ArrayList<>();
+
+        String sql = """
+            SELECT r.*, b.borrower_name
+            FROM borrow_records r
+            JOIN borrowers b ON r.borrower_id = b.borrower_id
+            WHERE r.status = 'Borrowed'
+            AND TIMESTAMPDIFF(DAY, r.borrow_date, NOW()) > ?
+        """;
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, days);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                BorrowRecord rec = new BorrowRecord();
+                rec.setRecordId(rs.getInt("record_id"));
+                rec.setItemId(rs.getInt("item_id"));
+                rec.setBorrowerId(rs.getInt("borrower_id"));
+                rec.setBorrowerName(rs.getString("borrower_name"));
+                rec.setBorrowDate(rs.getTimestamp("borrow_date").toLocalDateTime());
+                rec.setStatus("Missing");
+
+                int overdue = calculateDaysOverdue(rec.getBorrowDate());
+                rec.setDaysOverdue(overdue);
+
+                list.add(rec);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    // 🚀 Get overdue records and auto-mark Missing
+    public List<BorrowRecord> getAndMarkOverdue(int days) {
+        List<BorrowRecord> list = new ArrayList<>();
+
+        String sql = """
+        SELECT r.*, b.borrower_name 
+        FROM borrow_records r
+        JOIN borrowers b ON r.borrower_id = b.borrower_id
+        WHERE r.status = 'Borrowed'
+          AND r.return_date IS NULL
+          AND TIMESTAMPDIFF(DAY, r.borrow_date, NOW()) > ?
+    """;
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, days);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                BorrowRecord rec = new BorrowRecord();
+                rec.setRecordId(rs.getInt("record_id"));
+                rec.setItemId(rs.getInt("item_id"));
+                rec.setBorrowerId(rs.getInt("borrower_id"));
+                rec.setBorrowerName(rs.getString("borrower_name"));
+                rec.setBorrowDate(rs.getTimestamp("borrow_date").toLocalDateTime());
+                rec.setStatus("Missing");
+
+                list.add(rec);
+
+                // Update borrow record to Missing
+//                markMissing(rec.getRecordId());
+
+                // Update item table as Missing
+                updateItemMissing(rec.getItemId());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+// ✔ update borrow record status
+//    private void markMissing(int recordId) {
+//        String sql = "UPDATE borrow_records SET status='Missing' WHERE record_id=?";
+//        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+//            ps.setInt(1, recordId);
+//            ps.executeUpdate();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+// ✔ update items table
+    private void updateItemMissing(int itemId) {
+        String sql = "UPDATE items SET status='Missing' WHERE item_id=?";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, itemId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+// ✔ count overdue for notification badge
+    public int getOverdueCount(int days) {
+        String sql = """
+        SELECT COUNT(*) 
+        FROM borrow_records
+        WHERE status = 'Borrowed'
+          AND return_date IS NULL
+          AND TIMESTAMPDIFF(DAY, borrow_date, NOW()) > ?
+    """;
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, days);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    // ---------------------------------------------------------
+    // UPDATE STATUS: BORROWED
+    // ---------------------------------------------------------
     public void updateItemStatusToBorrowed(int itemId) {
         String sql = "UPDATE items SET status='Borrowed' WHERE item_id=?";
 
@@ -43,7 +195,9 @@ public class BorrowRecordDAO {
         }
     }
 
-    // Borrow records by item
+    // =========================================================
+    // GET RECORDS BY ITEM ID
+    // =========================================================
     public List<BorrowRecord> getBorrowRecordsByItemId(int itemId) {
         List<BorrowRecord> list = new ArrayList<>();
 
@@ -68,12 +222,22 @@ public class BorrowRecordDAO {
                             rs.getInt("borrower_id"),
                             rs.getTimestamp("borrow_date").toLocalDateTime(),
                             rs.getTimestamp("return_date") != null
-                            ? rs.getTimestamp("return_date").toLocalDateTime() : null,
+                            ? rs.getTimestamp("return_date").toLocalDateTime()
+                            : null,
                             rs.getString("status"),
                             rs.getString("remarks")
                     );
 
                     record.setBorrowerName(rs.getString("borrower_name"));
+
+                    // NEW: overdue detection
+                    int overdue = calculateDaysOverdue(record.getBorrowDate());
+                    record.setDaysOverdue(overdue);
+
+                    if (overdue > 0 && record.getReturnDate() == null) {
+                        record.setStatus("Missing");
+                    }
+
                     list.add(record);
                 }
             }
@@ -85,9 +249,15 @@ public class BorrowRecordDAO {
         return list;
     }
 
-    // Insert a full borrow record
+    // =========================================================
+    // INSERT FULL BORROW RECORD
+    // =========================================================
     public void addBorrowRecord(BorrowRecord record) {
-        String sql = "INSERT INTO borrow_records (item_id, borrower_id, borrow_date, return_date, status, remarks) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = """
+            INSERT INTO borrow_records 
+            (item_id, borrower_id, borrow_date, return_date, status, remarks)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """;
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -111,7 +281,9 @@ public class BorrowRecordDAO {
         }
     }
 
-    // Get all borrow records
+    // =========================================================
+    // GET ALL RECORDS
+    // =========================================================
     public List<BorrowRecord> getAllBorrowRecords() {
         List<BorrowRecord> list = new ArrayList<>();
         String sql = "SELECT * FROM borrow_records";
@@ -125,10 +297,18 @@ public class BorrowRecordDAO {
                         rs.getInt("borrower_id"),
                         rs.getTimestamp("borrow_date").toLocalDateTime(),
                         rs.getTimestamp("return_date") != null
-                        ? rs.getTimestamp("return_date").toLocalDateTime() : null,
+                        ? rs.getTimestamp("return_date").toLocalDateTime()
+                        : null,
                         rs.getString("status"),
                         rs.getString("remarks")
                 );
+
+                int overdue = calculateDaysOverdue(r.getBorrowDate());
+                r.setDaysOverdue(overdue);
+
+                if (overdue > 0 && r.getReturnDate() == null) {
+                    r.setStatus("Missing");
+                }
 
                 list.add(r);
             }
@@ -140,7 +320,9 @@ public class BorrowRecordDAO {
         return list;
     }
 
-    // Get one record by ID
+    // =========================================================
+    // GET BY RECORD ID
+    // =========================================================
     public BorrowRecord getBorrowRecordById(int id) {
         String sql = "SELECT * FROM borrow_records WHERE record_id=?";
 
@@ -151,18 +333,27 @@ public class BorrowRecordDAO {
             try (ResultSet rs = stmt.executeQuery()) {
 
                 if (rs.next()) {
-                    return new BorrowRecord(
+                    BorrowRecord r = new BorrowRecord(
                             rs.getInt("record_id"),
                             rs.getInt("item_id"),
                             rs.getInt("borrower_id"),
                             rs.getTimestamp("borrow_date").toLocalDateTime(),
                             rs.getTimestamp("return_date") != null
-                            ? rs.getTimestamp("return_date").toLocalDateTime() : null,
+                            ? rs.getTimestamp("return_date").toLocalDateTime()
+                            : null,
                             rs.getString("status"),
                             rs.getString("remarks")
                     );
-                }
 
+                    int overdue = calculateDaysOverdue(r.getBorrowDate());
+                    r.setDaysOverdue(overdue);
+
+                    if (overdue > 0 && r.getReturnDate() == null) {
+                        r.setStatus("Missing");
+                    }
+
+                    return r;
+                }
             }
 
         } catch (SQLException e) {
@@ -172,9 +363,15 @@ public class BorrowRecordDAO {
         return null;
     }
 
-    // Update full record
+    // =========================================================
+    // UPDATE RECORD
+    // =========================================================
     public void updateBorrowRecord(BorrowRecord record) {
-        String sql = "UPDATE borrow_records SET item_id=?, borrower_id=?, borrow_date=?, return_date=?, status=?, remarks=? WHERE record_id=?";
+        String sql = """
+            UPDATE borrow_records 
+            SET item_id=?, borrower_id=?, borrow_date=?, return_date=?, status=?, remarks=? 
+            WHERE record_id=?
+        """;
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -199,7 +396,9 @@ public class BorrowRecordDAO {
         }
     }
 
-    // Delete
+    // =========================================================
+    // DELETE RECORD
+    // =========================================================
     public void deleteBorrowRecord(int id) {
         String sql = "DELETE FROM borrow_records WHERE record_id=?";
 
@@ -213,7 +412,9 @@ public class BorrowRecordDAO {
         }
     }
 
-    // Borrow records by borrower
+    // =========================================================
+    // GET RECORDS BY BORROWER
+    // =========================================================
     public List<BorrowRecord> getBorrowRecordsByBorrower(int borrowerId) {
         List<BorrowRecord> list = new ArrayList<>();
         String sql = "SELECT * FROM borrow_records WHERE borrower_id=?";
@@ -230,10 +431,18 @@ public class BorrowRecordDAO {
                             rs.getInt("borrower_id"),
                             rs.getTimestamp("borrow_date").toLocalDateTime(),
                             rs.getTimestamp("return_date") != null
-                            ? rs.getTimestamp("return_date").toLocalDateTime() : null,
+                            ? rs.getTimestamp("return_date").toLocalDateTime()
+                            : null,
                             rs.getString("status"),
                             rs.getString("remarks")
                     );
+
+                    int overdue = calculateDaysOverdue(r.getBorrowDate());
+                    r.setDaysOverdue(overdue);
+
+                    if (overdue > 0 && r.getReturnDate() == null) {
+                        r.setStatus("Missing");
+                    }
 
                     list.add(r);
                 }
@@ -246,9 +455,15 @@ public class BorrowRecordDAO {
         return list;
     }
 
-    // Mark as returned
+    // =========================================================
+    // MARK AS RETURNED
+    // =========================================================
     public void returnBorrowRecord(int recordId, LocalDateTime returnDate, String remarks) {
-        String sql = "UPDATE borrow_records SET return_date=?, status=?, remarks=? WHERE record_id=?";
+        String sql = """
+            UPDATE borrow_records 
+            SET return_date=?, status=?, remarks=? 
+            WHERE record_id=?
+        """;
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -264,12 +479,17 @@ public class BorrowRecordDAO {
         }
     }
 
+    // =========================================================
+    // COUNTS (Dashboard)
+    // =========================================================
     public int getTotalBorrowRecords() {
         String sql = "SELECT COUNT(*) AS total FROM borrow_records";
         try (var conn = DatabaseConnection.getConnection(); var stmt = conn.prepareStatement(sql); var rs = stmt.executeQuery()) {
+
             if (rs.next()) {
                 return rs.getInt("total");
             }
+
         } catch (Exception e) {
             System.err.println("❌ getTotalBorrowRecords error: " + e.getMessage());
         }
@@ -279,9 +499,11 @@ public class BorrowRecordDAO {
     public int getActiveBorrowRecordsCount() {
         String sql = "SELECT COUNT(*) AS total FROM borrow_records WHERE status = 'Borrowed'";
         try (var conn = DatabaseConnection.getConnection(); var stmt = conn.prepareStatement(sql); var rs = stmt.executeQuery()) {
+
             if (rs.next()) {
                 return rs.getInt("total");
             }
+
         } catch (Exception e) {
             System.err.println("❌ getActiveBorrowRecordsCount error: " + e.getMessage());
         }
@@ -291,9 +513,11 @@ public class BorrowRecordDAO {
     public int getBorrowedTodayCount() {
         String sql = "SELECT COUNT(*) AS total FROM borrow_records WHERE status = 'Borrowed' AND DATE(borrow_date) = CURDATE()";
         try (var conn = DatabaseConnection.getConnection(); var stmt = conn.prepareStatement(sql); var rs = stmt.executeQuery()) {
+
             if (rs.next()) {
                 return rs.getInt("total");
             }
+
         } catch (Exception e) {
             System.err.println("❌ getBorrowedTodayCount error: " + e.getMessage());
         }
@@ -303,9 +527,11 @@ public class BorrowRecordDAO {
     public int getReturnedTodayCount() {
         String sql = "SELECT COUNT(*) AS total FROM borrow_records WHERE status = 'Returned' AND DATE(return_date) = CURDATE()";
         try (var conn = DatabaseConnection.getConnection(); var stmt = conn.prepareStatement(sql); var rs = stmt.executeQuery()) {
+
             if (rs.next()) {
                 return rs.getInt("total");
             }
+
         } catch (Exception e) {
             System.err.println("❌ getReturnedTodayCount error: " + e.getMessage());
         }

@@ -33,6 +33,8 @@ public class Item {
 
     // Required empty constructor
     public Item() {}
+    
+    
 
     public Item(int itemId, String itemName, String itemCode, int categoryId,
                 String unit, LocalDate dateAcquired, String status,
