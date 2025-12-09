@@ -10,16 +10,20 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class LoginController implements Initializable {
@@ -60,38 +64,52 @@ public class LoginController implements Initializable {
         User user = UserDAO.getUser(username, password);
 
         if (user != null) {
-            AuditLogDAO.log(username, "LOGIN", "User logged into the system");
-            showAlert("Success", "Login successful! Welcome " + user.getUsername());
-            // 🔹 Switch to dashboard here
-            try {
-                // Load dashboard
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/inventorysystem/views/dashboard.fxml"));
-                Parent dashboardRoot = loader.load();
 
-                // Get current stage
-                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            // --- Show Access Granted popup then switch screen ---
+            showAccessGrantedPopup(user.getUsername(), () -> {
 
-                // Create new scene with different size
-                Scene dashboardScene = new Scene(dashboardRoot, 1200, 750);
-                dashboardScene.getStylesheets().add(getClass().getResource("/inventorysystem/assets/styles.css").toExternalForm());
-                ItemController.setLoggedUsername(user.getUsername());
-                ItemController.setLoggedUser(user.getId(), user.getUsername(), user.getFirstName(), user.getLastName());
+                try {
+                    FXMLLoader loader = new FXMLLoader(
+                            getClass().getResource("/inventorysystem/views/dashboard.fxml")
+                    );
+                    Parent dashboardRoot = loader.load();
 
-                // Set scene & allow resizing
-                stage.setScene(dashboardScene);
-                stage.setResizable(true);
-                stage.centerOnScreen();
-                stage.getIcons().add(
-                        new Image(getClass().getResourceAsStream("/inventorysystem/assets/app_icon.png"))
-                );
+                    // Get stage safely!
+                    Stage stage = getStage();
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                    Scene dashboardScene = new Scene(dashboardRoot, 1200, 750);
+                    dashboardScene.getStylesheets().add(
+                            getClass().getResource("/inventorysystem/assets/styles.css").toExternalForm()
+                    );
+
+                    // Pass user info
+                    ItemController.setLoggedUsername(user.getUsername());
+                    ItemController.setLoggedUserNames(user.getFirstName(), user.getLastName());
+
+                    stage.setScene(dashboardScene);
+                    stage.setResizable(true);
+                    stage.centerOnScreen();
+                    stage.getIcons().add(
+                            new Image(getClass().getResourceAsStream("/inventorysystem/assets/app_icon.png"))
+                    );
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
         } else {
             showAlert("Access Denied", "Invalid username or password.");
             System.out.println("Invalid username or password.");
         }
+    }
+
+    private Stage getStage() {
+        if (loginBtn.getScene() != null) {
+            return (Stage) loginBtn.getScene().getWindow();
+        }
+        // Fallback in case loginBtn has no scene yet
+        return (Stage) loginBtn.getParent().getScene().getWindow();
     }
 
     @FXML
@@ -112,6 +130,55 @@ public class LoginController implements Initializable {
         }
     }
 
+    private void showAccessGrantedPopup(String username, Runnable onClose) {
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initStyle(javafx.stage.StageStyle.UNDECORATED);
+        popup.setAlwaysOnTop(true);
+
+        VBox root = new VBox(12);
+        root.setAlignment(Pos.CENTER);
+        root.setStyle(
+                "-fx-background-color: white;"
+                + "-fx-padding: 22;"
+                + "-fx-border-color: #dcdcdc;"
+                + "-fx-border-width: 1;"
+                + "-fx-background-radius: 12;"
+                + "-fx-border-radius: 12;"
+                + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.20), 12, 0, 0, 3);"
+        );
+
+        Label icon = new Label("✔");
+        icon.setStyle("-fx-font-size: 40px; -fx-text-fill: #2ecc71;");
+
+        Label title = new Label("Access Granted");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        Label msg = new Label("Welcome, " + username + "!");
+        msg.setStyle("-fx-font-size: 14px; -fx-text-fill: #7f8c8d;");
+
+        root.getChildren().addAll(icon, title, msg);
+
+        Scene scene = new Scene(root, 300, 180);
+        popup.setScene(scene);
+
+        // Auto-close popup after 1.5 seconds
+        new Thread(() -> {
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException ignored) {
+            }
+            javafx.application.Platform.runLater(() -> {
+                popup.close();
+                if (onClose != null) {
+                    onClose.run();
+                }
+            });
+        }).start();
+
+        popup.showAndWait();
+    }
+
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -119,4 +186,10 @@ public class LoginController implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    @FXML
+    private void exitApp(MouseEvent event) {
+        System.exit(0);
+    }
+
 }

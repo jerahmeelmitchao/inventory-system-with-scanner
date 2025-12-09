@@ -28,23 +28,53 @@
                 <Label text="📊 Inventory overview"
                        style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
             </HBox>
+            
+            <HBox alignment="CENTER_RIGHT" spacing="20">
+    
+                <StackPane fx:id="notifBell"
+                           style="-fx-cursor: hand; -fx-padding: 4;"
+                           alignment="CENTER">
+
+                    <!-- Bell Icon -->
+                    <Label text="🔔"
+                           style="-fx-font-size: 26px;" />
+
+                    <!-- Notification Badge -->
+                    <Label fx:id="notifCount"
+                           text="0"
+                           visible="false"
+                           style="
+                -fx-background-color: #e63946;
+                -fx-text-fill: white;
+                -fx-font-size: 11px;
+                -fx-font-weight: bold;
+                -fx-background-radius: 12;
+                -fx-padding: 2 6;
+           "
+                           StackPane.alignment="TOP_RIGHT"
+                           translateX="-4" translateY="4"/>
+                </StackPane>
+
+
+            </HBox>
+
 
            
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Quick Actions:"
-                           style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d;"/>
+                       style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d;"/>
 
                 <HBox spacing="8">
                     <Button fx:id="btnAddItem" text="➕ Add Item"
-                                style="-fx-background-radius: 4; -fx-background-color: #3498db;
+                            style="-fx-background-radius: 4; -fx-background-color: #3498db;
                        -fx-text-fill: white; -fx-padding: 6 18; -fx-font-weight: bold;"/>
 
                     <Button fx:id="btnAddBorrower" text="➕ Add Borrower"
-                                style="-fx-background-radius: 4; -fx-background-color: #2ecc71;
+                            style="-fx-background-radius: 4; -fx-background-color: #2ecc71;
                        -fx-text-fill: white; -fx-padding: 6 18; -fx-font-weight: bold;"/>
 
                     <Button fx:id="btnAddCategory" text="➕ Add Category"
-                                style="-fx-background-radius: 4; -fx-background-color: #9b59b6;
+                            style="-fx-background-radius: 4; -fx-background-color: #9b59b6;
                        -fx-text-fill: white; -fx-padding: 6 18; -fx-font-weight: bold;"/>
                 </HBox>
             </HBox>

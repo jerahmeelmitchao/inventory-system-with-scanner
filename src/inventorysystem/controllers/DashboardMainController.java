@@ -4,9 +4,11 @@ import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.ItemDAO;
 import inventorysystem.dao.BorrowerDAO;
 import inventorysystem.dao.BorrowRecordDAO;
+import inventorysystem.models.BorrowRecord;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -18,6 +20,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import javafx.collections.FXCollections;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.StackPane;
 
 public class DashboardMainController {
 
@@ -73,10 +80,104 @@ public class DashboardMainController {
     }
 
     @FXML
+    private StackPane notifBell;
+    @FXML
+    private Label notifCount;
+
+    @FXML
     private void initialize() {
         loadStatsAndCharts();
         animateCards();
         setupQuickActions();
+
+        Platform.runLater(() -> {
+            checkOverdueBorrowedItems();
+            notifBell.setOnMouseClicked(e -> showOverduePopup());
+            checkOverdueBorrowedItems();
+        });
+
+    }
+
+    private void checkOverdueBorrowedItems() {
+        BorrowRecordDAO dao = new BorrowRecordDAO();
+
+        dao.getAndMarkOverdue(5);
+
+        int overdueCount = dao.getOverdueCount(5);
+        if (overdueCount > 0) {
+            notifCount.setText(String.valueOf(overdueCount));
+            notifCount.setVisible(true);
+        } else {
+            notifCount.setVisible(false);
+        }
+    }
+
+    private void showOverduePopup() {
+
+        BorrowRecordDAO dao = new BorrowRecordDAO();
+        var overdueList = dao.getOverdueRecords(5);
+
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Overdue Items");
+
+        // Compact nice panel
+        dialog.getDialogPane().setPrefWidth(380);
+        dialog.getDialogPane().setStyle(
+                "-fx-background-color: #ffffff;"
+                + "-fx-padding: 15;"
+                + "-fx-border-color: #d0d0d0;"
+                + "-fx-border-radius: 10;"
+                + "-fx-background-radius: 10;"
+        );
+
+        Label title = new Label("Items Overdue for More Than 5 Days");
+        title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        ListView<BorrowRecord> listView = new ListView<>();
+        listView.setPrefHeight(200);
+
+        // Load list
+        listView.setItems(FXCollections.observableArrayList(overdueList));
+
+        ItemDAO itemDAO = new ItemDAO();
+
+        // Styled cell (same style as return panel)
+        listView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(BorrowRecord r, boolean empty) {
+                super.updateItem(r, empty);
+
+                if (empty || r == null) {
+                    setText(null);
+                    return;
+                }
+
+                var item = itemDAO.getItemById(r.getItemId());
+                String itemName = item != null ? item.getItemName() : "Unknown Item";
+                String borrowDate = r.getBorrowDate().toString().replace("T", " ");
+
+                setText(
+                        itemName
+                        + "\nBorrower: " + r.getBorrowerName()
+                        + "\nBorrowed: " + borrowDate
+                        + "\nDays Overdue: " + r.getDaysOverdue()
+                );
+
+                setStyle("-fx-font-size: 13px; -fx-padding: 6; -fx-text-fill: #2c3e50;");
+            }
+        });
+
+        Label noItemsLabel = new Label("No overdue items.");
+        noItemsLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #7f8c8d;");
+        noItemsLabel.setVisible(overdueList.isEmpty());
+
+        VBox content = new VBox(10, title, overdueList.isEmpty() ? noItemsLabel : listView);
+        content.setStyle("-fx-padding: 5;");
+        dialog.getDialogPane().setContent(content);
+
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+
+        dialog.showAndWait();
     }
 
     private void loadStatsAndCharts() {

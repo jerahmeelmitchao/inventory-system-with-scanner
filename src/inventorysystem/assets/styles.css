@@ -501,6 +501,7 @@
     -fx-font-weight: bold;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.3, 0, 4);
     -fx-cursor: hand;
+    -fx-max-width: Infinity;
 }
 .login-btn:hover {
     -fx-background-color: #1b3d4e;

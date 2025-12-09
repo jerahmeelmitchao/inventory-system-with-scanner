@@ -23,12 +23,13 @@ public class BorrowRecord {
     private StringProperty statusProperty = new SimpleStringProperty("");
     private StringProperty remarksProperty = new SimpleStringProperty("");
 
-    public BorrowRecord() {}
+    public BorrowRecord() {
+    }
 
     // ✔ FIXED: Constructor now uses LocalDateTime instead of LocalDate
     public BorrowRecord(int recordId, int itemId, int borrowerId,
-                        LocalDateTime borrowDate, LocalDateTime returnDate,
-                        String status, String remarks) {
+            LocalDateTime borrowDate, LocalDateTime returnDate,
+            String status, String remarks) {
 
         this.recordId = recordId;
         this.itemId = itemId;
@@ -45,40 +46,77 @@ public class BorrowRecord {
         this.remarksProperty.set(remarks != null ? remarks : "");
     }
 
+    private int daysOverdue;
+
+    public int getDaysOverdue() {
+        return daysOverdue;
+    }
+
+    public void setDaysOverdue(int daysOverdue) {
+        this.daysOverdue = daysOverdue;
+    }
+
     // --------------------------------------------
     // Normal getters & setters
     // --------------------------------------------
-    public int getRecordId() { return recordId; }
-    public void setRecordId(int recordId) { this.recordId = recordId; }
+    public int getRecordId() {
+        return recordId;
+    }
 
-    public int getItemId() { return itemId; }
-    public void setItemId(int itemId) { this.itemId = itemId; }
+    public void setRecordId(int recordId) {
+        this.recordId = recordId;
+    }
 
-    public int getBorrowerId() { return borrowerId; }
-    public void setBorrowerId(int borrowerId) { this.borrowerId = borrowerId; }
+    public int getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(int itemId) {
+        this.itemId = itemId;
+    }
+
+    public int getBorrowerId() {
+        return borrowerId;
+    }
+
+    public void setBorrowerId(int borrowerId) {
+        this.borrowerId = borrowerId;
+    }
 
     // ✔ FIXED: return LocalDateTime
-    public LocalDateTime getBorrowDate() { return borrowDate; }
+    public LocalDateTime getBorrowDate() {
+        return borrowDate;
+    }
+
     public void setBorrowDate(LocalDateTime borrowDate) {
         this.borrowDate = borrowDate;
         this.borrowDateProperty.set(borrowDate != null ? borrowDate.toString() : "");
     }
 
     // ✔ FIXED: return LocalDateTime
-    public LocalDateTime getReturnDate() { return returnDate; }
+    public LocalDateTime getReturnDate() {
+        return returnDate;
+    }
+
     public void setReturnDate(LocalDateTime returnDate) {
         this.returnDate = returnDate;
         this.returnDateProperty.set(returnDate != null ? returnDate.toString() : "");
     }
 
-    public String getStatus() { return status; }
+    public String getStatus() {
+        return status;
+    }
+
     public void setStatus(String status) {
         this.status = status;
         this.statusProperty.set(status);
     }
 
     // REMARKS
-    public String getRemarks() { return remarks; }
+    public String getRemarks() {
+        return remarks;
+    }
+
     public void setRemarks(String remarks) {
         this.remarks = remarks;
         this.remarksProperty.set(remarks != null ? remarks : "");
@@ -87,14 +125,33 @@ public class BorrowRecord {
     // --------------------------------------------
     // JavaFX Properties
     // --------------------------------------------
-    public String getBorrowerName() { return borrowerName.get(); }
-    public void setBorrowerName(String name) { borrowerName.set(name); }
-    public StringProperty borrowerNameProperty() { return borrowerName; }
+    public String getBorrowerName() {
+        return borrowerName.get();
+    }
 
-    public StringProperty borrowDateProperty() { return borrowDateProperty; }
-    public StringProperty returnDateProperty() { return returnDateProperty; }
-    public StringProperty statusProperty() { return statusProperty; }
-    public StringProperty remarksProperty() { return remarksProperty; }
+    public void setBorrowerName(String name) {
+        borrowerName.set(name);
+    }
+
+    public StringProperty borrowerNameProperty() {
+        return borrowerName;
+    }
+
+    public StringProperty borrowDateProperty() {
+        return borrowDateProperty;
+    }
+
+    public StringProperty returnDateProperty() {
+        return returnDateProperty;
+    }
+
+    public StringProperty statusProperty() {
+        return statusProperty;
+    }
+
+    public StringProperty remarksProperty() {
+        return remarksProperty;
+    }
 
     @Override
     public String toString() {
