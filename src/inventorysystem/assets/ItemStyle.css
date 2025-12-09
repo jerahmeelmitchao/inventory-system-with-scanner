@@ -2,11 +2,11 @@
 .root-bg {
     -fx-background-color: #f0f2f5;
 
-    -fx-min-width: 600;
-    -fx-min-height: 400;
+    -fx-min-width: 680;
+    -fx-min-height: 900;
 
     -fx-pref-width: 680;
-    -fx-pref-height: 880;
+    -fx-pref-height: 900;
 
     -fx-max-width: 1200;
     -fx-max-height: 900;
