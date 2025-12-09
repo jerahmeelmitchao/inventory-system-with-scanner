@@ -14,9 +14,7 @@ public class BorrowerDAO {
         List<Borrower> list = new ArrayList<>();
         String sql = "SELECT borrower_id, borrower_name, position, borrower_type FROM borrowers ORDER BY borrower_name";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Borrower b = new Borrower(
@@ -38,8 +36,7 @@ public class BorrowerDAO {
     public Borrower getBorrowerById(int id) {
         String sql = "SELECT borrower_id, borrower_name, position, borrower_type FROM borrowers WHERE borrower_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
 
@@ -65,8 +62,7 @@ public class BorrowerDAO {
     public boolean insertBorrower(Borrower borrower) {
         String sql = "INSERT INTO borrowers (borrower_name, position, borrower_type) VALUES (?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, borrower.getBorrowerName());
             ps.setString(2, borrower.getPosition());
@@ -94,8 +90,7 @@ public class BorrowerDAO {
     public boolean updateBorrower(Borrower borrower) {
         String sql = "UPDATE borrowers SET borrower_name = ?, position = ?, borrower_type = ? WHERE borrower_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, borrower.getBorrowerName());
             ps.setString(2, borrower.getPosition());
@@ -115,8 +110,7 @@ public class BorrowerDAO {
     public boolean deleteBorrower(int borrowerId) {
         String sql = "DELETE FROM borrowers WHERE borrower_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, borrowerId);
             return ps.executeUpdate() > 0;
@@ -133,8 +127,7 @@ public class BorrowerDAO {
         List<Borrower> list = new ArrayList<>();
         String sql = "SELECT borrower_id, borrower_name, position, borrower_type FROM borrowers WHERE borrower_type = ? ORDER BY borrower_name";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, type);
 
@@ -159,11 +152,10 @@ public class BorrowerDAO {
     // Search borrowers by keyword
     public List<Borrower> searchBorrower(String keyword) {
         List<Borrower> list = new ArrayList<>();
-        String sql = "SELECT borrower_id, borrower_name, position, borrower_type " +
-                     "FROM borrowers WHERE LOWER(borrower_name) LIKE ? ORDER BY borrower_name";
+        String sql = "SELECT borrower_id, borrower_name, position, borrower_type "
+                + "FROM borrowers WHERE LOWER(borrower_name) LIKE ? ORDER BY borrower_name";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, "%" + keyword.toLowerCase() + "%");
 
@@ -184,4 +176,17 @@ public class BorrowerDAO {
 
         return list;
     }
+
+    public int getTotalBorrowers() {
+        String sql = "SELECT COUNT(*) AS total FROM borrowers";
+        try (var conn = DatabaseConnection.getConnection(); var stmt = conn.prepareStatement(sql); var rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            System.err.println("❌ getTotalBorrowers error: " + e.getMessage());
+        }
+        return 0;
+    }
+
 }

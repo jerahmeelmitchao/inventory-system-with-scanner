@@ -14,8 +14,7 @@ public class BorrowRecordDAO {
     public boolean insertBorrow(int itemId, int borrowerId) {
         String sql = "INSERT INTO borrow_records (item_id, borrower_id, status) VALUES (?, ?, 'Borrowed')";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, itemId);
             stmt.setInt(2, borrowerId);
@@ -34,8 +33,7 @@ public class BorrowRecordDAO {
     public void updateItemStatusToBorrowed(int itemId) {
         String sql = "UPDATE items SET status='Borrowed' WHERE item_id=?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, itemId);
             stmt.executeUpdate();
@@ -57,8 +55,7 @@ public class BorrowRecordDAO {
             ORDER BY br.borrow_date DESC
         """;
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, itemId);
 
@@ -70,8 +67,8 @@ public class BorrowRecordDAO {
                             rs.getInt("item_id"),
                             rs.getInt("borrower_id"),
                             rs.getTimestamp("borrow_date").toLocalDateTime(),
-                            rs.getTimestamp("return_date") != null ?
-                                    rs.getTimestamp("return_date").toLocalDateTime() : null,
+                            rs.getTimestamp("return_date") != null
+                            ? rs.getTimestamp("return_date").toLocalDateTime() : null,
                             rs.getString("status"),
                             rs.getString("remarks")
                     );
@@ -92,8 +89,7 @@ public class BorrowRecordDAO {
     public void addBorrowRecord(BorrowRecord record) {
         String sql = "INSERT INTO borrow_records (item_id, borrower_id, borrow_date, return_date, status, remarks) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, record.getItemId());
             stmt.setInt(2, record.getBorrowerId());
@@ -120,9 +116,7 @@ public class BorrowRecordDAO {
         List<BorrowRecord> list = new ArrayList<>();
         String sql = "SELECT * FROM borrow_records";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 BorrowRecord r = new BorrowRecord(
@@ -130,8 +124,8 @@ public class BorrowRecordDAO {
                         rs.getInt("item_id"),
                         rs.getInt("borrower_id"),
                         rs.getTimestamp("borrow_date").toLocalDateTime(),
-                        rs.getTimestamp("return_date") != null ?
-                                rs.getTimestamp("return_date").toLocalDateTime() : null,
+                        rs.getTimestamp("return_date") != null
+                        ? rs.getTimestamp("return_date").toLocalDateTime() : null,
                         rs.getString("status"),
                         rs.getString("remarks")
                 );
@@ -150,8 +144,7 @@ public class BorrowRecordDAO {
     public BorrowRecord getBorrowRecordById(int id) {
         String sql = "SELECT * FROM borrow_records WHERE record_id=?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
 
@@ -163,8 +156,8 @@ public class BorrowRecordDAO {
                             rs.getInt("item_id"),
                             rs.getInt("borrower_id"),
                             rs.getTimestamp("borrow_date").toLocalDateTime(),
-                            rs.getTimestamp("return_date") != null ?
-                                    rs.getTimestamp("return_date").toLocalDateTime() : null,
+                            rs.getTimestamp("return_date") != null
+                            ? rs.getTimestamp("return_date").toLocalDateTime() : null,
                             rs.getString("status"),
                             rs.getString("remarks")
                     );
@@ -183,8 +176,7 @@ public class BorrowRecordDAO {
     public void updateBorrowRecord(BorrowRecord record) {
         String sql = "UPDATE borrow_records SET item_id=?, borrower_id=?, borrow_date=?, return_date=?, status=?, remarks=? WHERE record_id=?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, record.getItemId());
             stmt.setInt(2, record.getBorrowerId());
@@ -211,8 +203,7 @@ public class BorrowRecordDAO {
     public void deleteBorrowRecord(int id) {
         String sql = "DELETE FROM borrow_records WHERE record_id=?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
             stmt.executeUpdate();
@@ -227,8 +218,7 @@ public class BorrowRecordDAO {
         List<BorrowRecord> list = new ArrayList<>();
         String sql = "SELECT * FROM borrow_records WHERE borrower_id=?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, borrowerId);
 
@@ -239,8 +229,8 @@ public class BorrowRecordDAO {
                             rs.getInt("item_id"),
                             rs.getInt("borrower_id"),
                             rs.getTimestamp("borrow_date").toLocalDateTime(),
-                            rs.getTimestamp("return_date") != null ?
-                                    rs.getTimestamp("return_date").toLocalDateTime() : null,
+                            rs.getTimestamp("return_date") != null
+                            ? rs.getTimestamp("return_date").toLocalDateTime() : null,
                             rs.getString("status"),
                             rs.getString("remarks")
                     );
@@ -260,8 +250,7 @@ public class BorrowRecordDAO {
     public void returnBorrowRecord(int recordId, LocalDateTime returnDate, String remarks) {
         String sql = "UPDATE borrow_records SET return_date=?, status=?, remarks=? WHERE record_id=?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setTimestamp(1, Timestamp.valueOf(returnDate));
             stmt.setString(2, "Returned");
@@ -274,4 +263,53 @@ public class BorrowRecordDAO {
             e.printStackTrace();
         }
     }
+
+    public int getTotalBorrowRecords() {
+        String sql = "SELECT COUNT(*) AS total FROM borrow_records";
+        try (var conn = DatabaseConnection.getConnection(); var stmt = conn.prepareStatement(sql); var rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            System.err.println("❌ getTotalBorrowRecords error: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public int getActiveBorrowRecordsCount() {
+        String sql = "SELECT COUNT(*) AS total FROM borrow_records WHERE status = 'Borrowed'";
+        try (var conn = DatabaseConnection.getConnection(); var stmt = conn.prepareStatement(sql); var rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            System.err.println("❌ getActiveBorrowRecordsCount error: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public int getBorrowedTodayCount() {
+        String sql = "SELECT COUNT(*) AS total FROM borrow_records WHERE status = 'Borrowed' AND DATE(borrow_date) = CURDATE()";
+        try (var conn = DatabaseConnection.getConnection(); var stmt = conn.prepareStatement(sql); var rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            System.err.println("❌ getBorrowedTodayCount error: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public int getReturnedTodayCount() {
+        String sql = "SELECT COUNT(*) AS total FROM borrow_records WHERE status = 'Returned' AND DATE(return_date) = CURDATE()";
+        try (var conn = DatabaseConnection.getConnection(); var stmt = conn.prepareStatement(sql); var rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            System.err.println("❌ getReturnedTodayCount error: " + e.getMessage());
+        }
+        return 0;
+    }
+
 }

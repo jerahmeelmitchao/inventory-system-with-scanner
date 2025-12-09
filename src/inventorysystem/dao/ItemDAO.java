@@ -9,14 +9,14 @@ import java.util.List;
 
 public class ItemDAO {
 
-    // --------------------------
+    // ----------------------------------------------------
     // ADD ITEM
-    // --------------------------
+    // ----------------------------------------------------
     public boolean addItem(Item item) {
 
         String sql = """
             INSERT INTO items 
-            (item_name, barcode, category_id, unit, date_acquired, status, 
+            (item_name, item_code, category_id, unit, date_acquired, status, 
              storage_location, incharge_id, added_by, description)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
@@ -24,10 +24,16 @@ public class ItemDAO {
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, item.getItemName());
-            stmt.setString(2, item.getBarcode());
+            stmt.setString(2, item.getItemCode());
             stmt.setInt(3, item.getCategoryId());
             stmt.setString(4, item.getUnit());
-            stmt.setDate(5, Date.valueOf(item.getDateAcquired()));
+
+            if (item.getDateAcquired() != null) {
+                stmt.setDate(5, Date.valueOf(item.getDateAcquired()));
+            } else {
+                stmt.setNull(5, Types.DATE);
+            }
+
             stmt.setString(6, item.getStatus());
             stmt.setString(7, item.getStorageLocation());
 
@@ -58,42 +64,23 @@ public class ItemDAO {
         return false;
     }
 
-    // --------------------------
-    // GET ITEM BY BARCODE
-    // --------------------------
-    public Item getItemByBarcode(String barcode) {
+    // ----------------------------------------------------
+    // GET ITEM BY BARCODE / ITEM_CODE
+    // ----------------------------------------------------
+    public Item getItemByBarcode(String itemCode) {
 
         String sql = """
-            SELECT * FROM items 
-            WHERE LOWER(barcode) = LOWER(?)
+            SELECT * FROM items
+            WHERE LOWER(item_code) = LOWER(?)
         """;
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, barcode);
+            ps.setString(1, itemCode);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                Item item = new Item();
-
-                item.setItemId(rs.getInt("item_id"));
-                item.setItemName(rs.getString("item_name"));
-                item.setBarcode(rs.getString("barcode"));
-                item.setCategoryId(rs.getInt("category_id"));
-                item.setUnit(rs.getString("unit"));
-                item.setDateAcquired(rs.getDate("date_acquired").toLocalDate());
-                item.setStatus(rs.getString("status"));
-                item.setStorageLocation(rs.getString("storage_location"));
-                item.setInchargeId(rs.getInt("incharge_id"));
-                item.setAddedBy(rs.getString("added_by"));
-                item.setDescription(rs.getString("description"));
-
-                Timestamp lastScan = rs.getTimestamp("last_scanned");
-                if (lastScan != null) {
-                    item.setLastScanned(lastScan.toLocalDateTime().toLocalDate());
-                }
-
-                return item;
+                return mapResultSetToItem(rs);
             }
 
         } catch (Exception e) {
@@ -103,15 +90,15 @@ public class ItemDAO {
         return null;
     }
 
-    // --------------------------
+    // ----------------------------------------------------
     // GET ALL ITEMS
-    // --------------------------
+    // ----------------------------------------------------
     public List<Item> getAllItems() {
         List<Item> items = new ArrayList<>();
 
         String sql = """
             SELECT 
-                i.*, 
+                i.*,
                 c.category_name,
                 ic.incharge_name
             FROM items i
@@ -122,28 +109,7 @@ public class ItemDAO {
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-
-                Item item = new Item();
-
-                item.setItemId(rs.getInt("item_id"));
-                item.setItemName(rs.getString("item_name"));
-                item.setBarcode(rs.getString("barcode"));
-                item.setCategoryId(rs.getInt("category_id"));
-                item.setUnit(rs.getString("unit"));
-                item.setDateAcquired(rs.getDate("date_acquired").toLocalDate());
-                item.setStatus(rs.getString("status"));
-                item.setStorageLocation(rs.getString("storage_location"));
-                item.setInchargeId(rs.getInt("incharge_id"));
-                item.setAddedBy(rs.getString("added_by"));
-                item.setDescription(rs.getString("description"));
-
-                if (rs.getTimestamp("last_scanned") != null) {
-                    item.setLastScanned(rs.getTimestamp("last_scanned").toLocalDateTime().toLocalDate());
-                }
-
-                item.setCategoryName(rs.getString("category_name"));
-                item.setInChargeName(rs.getString("incharge_name"));
-
+                Item item = mapResultSetToItem(rs);
                 items.add(item);
             }
 
@@ -154,14 +120,14 @@ public class ItemDAO {
         return items;
     }
 
-    // --------------------------
+    // ----------------------------------------------------
     // UPDATE ITEM
-    // --------------------------
+    // ----------------------------------------------------
     public void updateItem(Item item) {
 
         String sql = """
             UPDATE items SET 
-                item_name=?, barcode=?, category_id=?, unit=?, 
+                item_name=?, item_code=?, category_id=?, unit=?, 
                 date_acquired=?, status=?, storage_location=?, 
                 incharge_id=?, added_by=?, description=?
             WHERE item_id=?
@@ -170,10 +136,16 @@ public class ItemDAO {
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, item.getItemName());
-            stmt.setString(2, item.getBarcode());
+            stmt.setString(2, item.getItemCode());
             stmt.setInt(3, item.getCategoryId());
             stmt.setString(4, item.getUnit());
-            stmt.setDate(5, Date.valueOf(item.getDateAcquired()));
+
+            if (item.getDateAcquired() != null) {
+                stmt.setDate(5, Date.valueOf(item.getDateAcquired()));
+            } else {
+                stmt.setNull(5, Types.DATE);
+            }
+
             stmt.setString(6, item.getStatus());
             stmt.setString(7, item.getStorageLocation());
 
@@ -194,11 +166,13 @@ public class ItemDAO {
         }
     }
 
-    // --------------------------
+    // ----------------------------------------------------
     // DELETE ITEM
-    // --------------------------
+    // ----------------------------------------------------
     public void deleteItem(int itemId) {
+
         String sql = "DELETE FROM items WHERE item_id=?";
+
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, itemId);
@@ -209,11 +183,12 @@ public class ItemDAO {
         }
     }
 
-    // --------------------------
-    // UPDATE STATUS ONLY
-    // --------------------------
+    // ----------------------------------------------------
+    // UPDATE STATUS
+    // ----------------------------------------------------
     public boolean updateItemStatus(int itemId, String status) {
         String sql = "UPDATE items SET status=? WHERE item_id=?";
+
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, status);
@@ -221,15 +196,119 @@ public class ItemDAO {
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            System.err.println("❌ Update Item Status Error: " + e.getMessage());
+            System.err.println("❌ Update Status Error: " + e.getMessage());
         }
+
         return false;
     }
-    // --------------------------
-// GET ITEM BY ID
-// --------------------------
 
+    // ----------------------------------------------------
+    // GET ITEM BY ID
+    // ----------------------------------------------------
     public Item getItemById(int itemId) {
+
+        String sql = """
+            SELECT 
+                i.*, 
+                c.category_name,
+                ic.incharge_name
+            FROM items i
+            LEFT JOIN categories c ON i.category_id = c.category_id
+            LEFT JOIN incharge ic ON i.incharge_id = ic.incharge_id
+            WHERE i.item_id = ?
+        """;
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, itemId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return mapResultSetToItem(rs);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ getItemById Error: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    // ----------------------------------------------------
+    // COUNT HELPERS
+    // ----------------------------------------------------
+    public int getTotalItems() {
+        return count("SELECT COUNT(*) FROM items");
+    }
+
+    public int getAvailableItemsCount() {
+        return count("SELECT COUNT(*) FROM items WHERE status = 'Available'");
+    }
+
+    public int getBorrowedItemsCount() {
+        return count("SELECT COUNT(*) FROM items WHERE status = 'Borrowed'");
+    }
+
+    public int getDamagedItemsCount() {
+        return count("SELECT COUNT(*) FROM items WHERE status = 'Damaged'");
+    }
+
+    private int count(String sql) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            return rs.next() ? rs.getInt(1) : 0;
+
+        } catch (SQLException e) {
+            System.err.println("❌ Count error: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    // ----------------------------------------------------
+    // MAPPING METHOD (Helper)
+    // ----------------------------------------------------
+    private Item mapResultSetToItem(ResultSet rs) throws SQLException {
+
+        Item item = new Item();
+
+        item.setItemId(rs.getInt("item_id"));
+        item.setItemName(rs.getString("item_name"));
+        item.setItemCode(rs.getString("item_code"));
+        item.setCategoryId(rs.getInt("category_id"));
+        item.setUnit(rs.getString("unit"));
+        item.setStatus(rs.getString("status"));
+        item.setStorageLocation(rs.getString("storage_location"));
+        item.setInchargeId(rs.getInt("incharge_id"));
+        item.setAddedBy(rs.getString("added_by"));
+        item.setDescription(rs.getString("description"));
+
+        Date acquired = rs.getDate("date_acquired");
+        if (acquired != null) {
+            item.setDateAcquired(acquired.toLocalDate());
+        }
+
+        Timestamp last = rs.getTimestamp("last_scanned");
+        if (last != null) {
+            item.setLastScanned(last.toLocalDateTime());
+        }
+
+        // Joined fields
+        try {
+            item.setCategoryName(rs.getString("category_name"));
+        } catch (Exception ignored) {
+        }
+        try {
+            item.setInChargeName(rs.getString("incharge_name"));
+        } catch (Exception ignored) {
+        }
+
+        return item;
+    }
+
+    // --------------------------
+    // GET ITEM BY NAME (LocalDateTime supported)
+    // --------------------------
+    public Item getItemByName(String itemName) {
 
         String sql = """
         SELECT 
@@ -239,12 +318,13 @@ public class ItemDAO {
         FROM items i
         LEFT JOIN categories c ON i.category_id = c.category_id
         LEFT JOIN incharge ic ON i.incharge_id = ic.incharge_id
-        WHERE i.item_id = ?
+        WHERE i.item_name = ?
+        LIMIT 1
     """;
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, itemId);
+            ps.setString(1, itemName);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -252,7 +332,7 @@ public class ItemDAO {
 
                 item.setItemId(rs.getInt("item_id"));
                 item.setItemName(rs.getString("item_name"));
-                item.setBarcode(rs.getString("barcode"));
+                item.setItemCode(rs.getString("barcode"));
                 item.setCategoryId(rs.getInt("category_id"));
                 item.setUnit(rs.getString("unit"));
                 item.setDateAcquired(rs.getDate("date_acquired").toLocalDate());
@@ -262,13 +342,12 @@ public class ItemDAO {
                 item.setAddedBy(rs.getString("added_by"));
                 item.setDescription(rs.getString("description"));
 
-                // last scanned (nullable)
-                Timestamp lastScan = rs.getTimestamp("last_scanned");
-                if (lastScan != null) {
-                    item.setLastScanned(lastScan.toLocalDateTime().toLocalDate());
+                // ✔ Keep LocalDateTime as-is
+                Timestamp ts = rs.getTimestamp("last_scanned");
+                if (ts != null) {
+                    item.setLastScanned(ts.toLocalDateTime());
                 }
 
-                // category name + incharge name (from JOIN)
                 item.setCategoryName(rs.getString("category_name"));
                 item.setInChargeName(rs.getString("incharge_name"));
 
@@ -276,7 +355,7 @@ public class ItemDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("❌ getItemById Error: " + e.getMessage());
+            System.err.println("❌ getItemByName Error: " + e.getMessage());
         }
 
         return null;

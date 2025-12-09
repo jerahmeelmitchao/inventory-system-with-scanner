@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="inventorysystem.controllers.ItemDetailsController"
+      spacing="15"
+      style="-fx-background-color: white; -fx-padding: 20;">
+
+    <Label text="📦 Item Details"
+           style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+
+    <GridPane hgap="10" vgap="8">
+        <columnConstraints>
+            <ColumnConstraints minWidth="120" halignment="RIGHT"/>
+            <ColumnConstraints minWidth="250" halignment="LEFT"/>
+        </columnConstraints>
+
+        <Label text="Item Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <Label fx:id="lblName" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Category:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <Label fx:id="lblCategory" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Unit:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <Label fx:id="lblUnit" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Status:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <Label fx:id="lblStatus" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Location:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <Label fx:id="lblLocation" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+        <Label text="Last Scanned:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <Label fx:id="lblLastScan" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+        <Label text="Description:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+        <TextArea fx:id="txtDescription"
+                  editable="false"
+                  prefRowCount="3"
+                  wrapText="true"
+                  GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <Button text="Close"
+            style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 6 20;"
+            onAction="#onClose"/>
+</VBox>

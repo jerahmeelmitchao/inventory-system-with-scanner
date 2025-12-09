@@ -1,74 +1,181 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<ScrollPane xmlns="http://javafx.com/javafx/25"
+<BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="inventorysystem.controllers.Dashboard2Controller"
-            fitToWidth="true" fitToHeight="true"
-            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-            styleClass="mainFxmlClass">
+            fx:controller="inventorysystem.controllers.DashboardMainController"
+            style="-fx-background-color: #f4f6f7;"
+            prefWidth="1100" prefHeight="650">
 
-    <content>
-        <VBox spacing="30">
-
+    <!-- TOP: Title + Quick Actions -->
+    <top>
+        <VBox spacing="10">
             <padding>
-                <Insets top="25" bottom="25" left="25" right="25"/>
+                <Insets top="20" right="20" bottom="10" left="20"/>
             </padding>
 
-            <!-- Stats Row -->
-            <GridPane hgap="20" vgap="20">
-                <columnConstraints>
-                    <ColumnConstraints percentWidth="25"/>
-                    <ColumnConstraints percentWidth="25"/>
-                    <ColumnConstraints percentWidth="25"/>
-                    <ColumnConstraints percentWidth="25"/>
-                </columnConstraints>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Dashboard"
+                       style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
 
-                <!-- Total Items Card -->
-                <VBox styleClass="stat-card" alignment="CENTER" GridPane.columnIndex="0">
-                    <Label text="📦 Total Items" styleClass="stat-card-title"/>
-                    <Label fx:id="lblTotalItems" text="0" styleClass="stat-card-value"/>
-                </VBox>
+                <Label text="📊 Inventory overview"
+                       style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+            </HBox>
 
-                <!-- Low Stock Card -->
-                <VBox styleClass="stat-card" alignment="CENTER" GridPane.columnIndex="1">
-                    <Label text="⚠️ Low Stock" styleClass="stat-card-title"/>
-                    <Label fx:id="lblLowStock" text="0" styleClass="stat-card-value"/>
-                </VBox>
+           
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Quick Actions:"
+                           style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d;"/>
 
-                <!-- Damaged Card -->
-                <VBox styleClass="stat-card" alignment="CENTER" GridPane.columnIndex="2">
-                    <Label text="💥 Damaged/Disposed" styleClass="stat-card-title"/>
-                    <Label fx:id="lblDamaged" text="0" styleClass="stat-card-value"/>
-                </VBox>
+                <HBox spacing="8">
+                    <Button fx:id="btnAddItem" text="➕ Add Item"
+                                style="-fx-background-radius: 4; -fx-background-color: #3498db;
+                       -fx-text-fill: white; -fx-padding: 6 18; -fx-font-weight: bold;"/>
 
-                <!-- Unscanned Card -->
-                <VBox styleClass="stat-card" alignment="CENTER" GridPane.columnIndex="3">
-                    <Label text="🕓 Unscanned" styleClass="stat-card-title"/>
-                    <Label fx:id="lblUnscanned" text="0" styleClass="stat-card-value"/>
-                </VBox>
-            </GridPane>
+                    <Button fx:id="btnAddBorrower" text="➕ Add Borrower"
+                                style="-fx-background-radius: 4; -fx-background-color: #2ecc71;
+                       -fx-text-fill: white; -fx-padding: 6 18; -fx-font-weight: bold;"/>
 
-            <!-- Charts Grid -->
-            <GridPane fx:id="chartContainer" hgap="30" vgap="30">
-                <columnConstraints>
-                    <ColumnConstraints percentWidth="50"/>
-                    <ColumnConstraints percentWidth="50"/>
-                </columnConstraints>
-                <rowConstraints>
-                    <RowConstraints percentHeight="50"/>
-                    <RowConstraints percentHeight="50"/>
-                </rowConstraints>
-            </GridPane>
+                    <Button fx:id="btnAddCategory" text="➕ Add Category"
+                                style="-fx-background-radius: 4; -fx-background-color: #9b59b6;
+                       -fx-text-fill: white; -fx-padding: 6 18; -fx-font-weight: bold;"/>
+                </HBox>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- CENTER: KPI Cards + Charts -->
+    <center>
+        <VBox spacing="25">
+            <padding>
+                <Insets top="10" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!-- ROW 1: Items related (bigger cards) -->
+            <HBox fx:id="row1" spacing="18">
+                <children>
+
+                    <VBox fx:id="cardTotalItems" spacing="8" HBox.hgrow="ALWAYS"
+                          prefWidth="240" minHeight="120"
+                          style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 4);">
+                        <Label text="📦 Total Items" style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+                        <Label fx:id="lblTotalItems" text="0"
+                               style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                        <Label text="All items in inventory" style="-fx-font-size: 12px; -fx-text-fill: #95a5a6;"/>
+                    </VBox>
+
+                    <VBox fx:id="cardAvailableItems" spacing="8" HBox.hgrow="ALWAYS"
+                          prefWidth="240" minHeight="120"
+                          style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 4);">
+                        <Label text="📗 Available Items" style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+                        <Label fx:id="lblAvailableItems" text="0"
+                               style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
+                        <Label text="Ready to be borrowed" style="-fx-font-size: 12px; -fx-text-fill: #95a5a6;"/>
+                    </VBox>
+
+                    <VBox fx:id="cardBorrowedItems" spacing="8" HBox.hgrow="ALWAYS"
+                          prefWidth="240" minHeight="120"
+                          style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 4);">
+                        <Label text="📕 Borrowed Items" style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+                        <Label fx:id="lblBorrowedItems" text="0"
+                               style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #e67e22;"/>
+                        <Label text="Currently out" style="-fx-font-size: 12px; -fx-text-fill: #95a5a6;"/>
+                    </VBox>
+
+                    <VBox fx:id="cardDamagedItems" spacing="8" HBox.hgrow="ALWAYS"
+                          prefWidth="240" minHeight="120"
+                          style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 4);">
+                        <Label text="⚠️ Damaged Items" style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+                        <Label fx:id="lblDamagedItems" text="0"
+                               style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #c0392b;"/>
+                        <Label text="Needs attention" style="-fx-font-size: 12px; -fx-text-fill: #95a5a6;"/>
+                    </VBox>
+
+                </children>
+            </HBox>
+
+            <!-- ROW 2: Borrowers & Records -->
+            <HBox fx:id="row2" spacing="18">
+                <children>
+
+                    <VBox fx:id="cardBorrowers" spacing="8" HBox.hgrow="ALWAYS"
+                          prefWidth="240" minHeight="120"
+                          style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 4);">
+                        <Label text="🧍 Borrowers" style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+                        <Label fx:id="lblTotalBorrowers" text="0"
+                               style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                        <Label text="Registered borrowers" style="-fx-font-size: 12px; -fx-text-fill: #95a5a6;"/>
+                    </VBox>
+
+                    <VBox fx:id="cardTotalRecords" spacing="8" HBox.hgrow="ALWAYS"
+                          prefWidth="240" minHeight="120"
+                          style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 4);">
+                        <Label text="📄 Borrow Records" style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+                        <Label fx:id="lblTotalRecords" text="0"
+                               style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                        <Label text="All borrow history" style="-fx-font-size: 12px; -fx-text-fill: #95a5a6;"/>
+                    </VBox>
+
+                    <VBox fx:id="cardActiveRecords" spacing="8" HBox.hgrow="ALWAYS"
+                          prefWidth="240" minHeight="120"
+                          style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 4);">
+                        <Label text="⏳ Active Borrows" style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+                        <Label fx:id="lblActiveBorrows" text="0"
+                               style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #e67e22;"/>
+                        <Label text="Still not returned" style="-fx-font-size: 12px; -fx-text-fill: #95a5a6;"/>
+                    </VBox>
+
+                    <VBox fx:id="cardTodayStats" spacing="8" HBox.hgrow="ALWAYS"
+                          prefWidth="240" minHeight="120"
+                          style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 4);">
+                        <Label text="📅 Today" style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+                        <Label fx:id="lblTodaySummary" text="0 / 0"
+                               style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                        <Label text="Borrowed / Returned" style="-fx-font-size: 12px; -fx-text-fill: #95a5a6;"/>
+                    </VBox>
+
+                </children>
+            </HBox>
+
+            <!-- ROW 3: Charts -->
+            <VBox spacing="10">
+                <Label text="Visual Overview"
+                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+
+                <HBox spacing="18">
+                    <VBox spacing="6" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3);">
+                        <Label text="📦 Item Status Distribution"
+                               style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d;"/>
+                        <PieChart fx:id="statusPieChart" prefHeight="220"/>
+                    </VBox>
+
+                    <VBox spacing="6" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 3);">
+                        <Label text="📅 Today Activity"
+                               style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d;"/>
+                        <BarChart fx:id="todayBarChart"
+                                  prefHeight="220"
+                                  legendVisible="false">
+                            <xAxis>
+                                <CategoryAxis fx:id="todayCategoryAxis"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis fx:id="todayNumberAxis" forceZeroInRange="true"/>
+                            </yAxis>
+                        </BarChart>
+                    </VBox>
+                </HBox>
+            </VBox>
 
         </VBox>
-    </content>
-</ScrollPane>
+    </center>
+
+</BorderPane>

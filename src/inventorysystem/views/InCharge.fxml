@@ -25,11 +25,8 @@
             </padding>
 
             <!-- Title -->
-            <Label text="Manage In-Charge" styleClass="title-label">
-                <font>
-                    <Font name="System Bold" size="24"/>
-                </font>
-            </Label>
+             <Label text="Manage In-Charge"
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
 
             <!-- Buttons -->
             <HBox spacing="10">
