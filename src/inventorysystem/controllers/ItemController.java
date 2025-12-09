@@ -33,6 +33,12 @@ import java.util.Optional;
 import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import inventorysystem.utils.BarcodeGenerator;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import javafx.embed.swing.SwingFXUtils;
+import org.krysalis.barcode4j.impl.code128.Code128Bean;
+import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 
 public class ItemController {
 
@@ -1108,6 +1114,123 @@ public class ItemController {
 
     public static void setLoggedUsername(String username) {
         loggedUsername = username;
+    }
+    @FXML
+    private Button exportBarcodeButton;
+
+    private void exportBarcodesPDF(List<Item> items) {
+        try {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Save Barcode PDF");
+            chooser.setInitialFileName("barcodes.pdf");
+            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+
+            File file = chooser.showSaveDialog(exportBarcodeButton.getScene().getWindow());
+            if (file == null) {
+                return;
+            }
+
+            Document doc = new Document(PageSize.A4, 40, 40, 40, 40);
+            PdfWriter writer = PdfWriter.getInstance(doc, new FileOutputStream(file));
+            doc.open();
+
+            int columns = 2; // 🔥 CHANGE: only 2 labels per row
+            PdfPTable table = new PdfPTable(columns);
+            table.setWidthPercentage(100);
+            table.setWidths(new float[]{1, 1}); // equal width
+
+            for (Item item : items) {
+
+                PdfPCell cell = new PdfPCell();
+                cell.setPadding(12);
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cell.setVerticalAlignment(Element.ALIGN_TOP);
+
+                // -----------------------------
+                // ITEM NAME
+                // -----------------------------
+                Paragraph name = new Paragraph(item.getItemName(),
+                        new Font(Font.HELVETICA, 12, Font.BOLD));
+                name.setAlignment(Element.ALIGN_CENTER);
+                cell.addElement(name);
+
+                // -----------------------------
+                // BARCODE (HIGH QUALITY)
+                // -----------------------------
+                Code128Bean bean = new Code128Bean();
+                bean.setModuleWidth(0.30);      // width of bars
+                bean.setBarHeight(10);          // height of bars
+                bean.doQuietZone(true);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                BitmapCanvasProvider canvas = new BitmapCanvasProvider(
+                        baos, "image/png", 300, BufferedImage.TYPE_BYTE_BINARY, false, 0);
+
+                bean.generateBarcode(canvas, item.getBarcode());
+                canvas.finish();
+
+                Image barcodeImg = Image.getInstance(baos.toByteArray());
+                barcodeImg.scaleAbsolute(180, 28); // 🔥 bigger, readable
+                barcodeImg.setAlignment(Image.ALIGN_CENTER);
+                cell.addElement(barcodeImg);
+
+                // -----------------------------
+                // BARCODE TEXT
+                // -----------------------------
+                Paragraph codeLabel = new Paragraph(item.getBarcode(),
+                        new Font(Font.HELVETICA, 10));
+                codeLabel.setAlignment(Element.ALIGN_CENTER);
+                cell.addElement(codeLabel);
+
+                table.addCell(cell);
+            }
+
+            // Fill last row if needed
+            int remainder = items.size() % columns;
+            if (remainder != 0) {
+                for (int i = 0; i < columns - remainder; i++) {
+                    table.addCell(new PdfPCell(new Phrase("")));
+                }
+            }
+
+            doc.add(table);
+            doc.close();
+
+            showAlert("Success", "Export Complete", "Barcodes exported successfully!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Export Failed", e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleExportBarcode() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Export Barcodes");
+        alert.setHeaderText("Choose items to export");
+        alert.setContentText("Export ALL items or only SELECTED items?");
+
+        ButtonType allBtn = new ButtonType("All Items");
+        ButtonType selectedBtn = new ButtonType("Selected Items");
+        ButtonType cancelBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(allBtn, selectedBtn, cancelBtn);
+        alert.initOwner(exportBarcodeButton.getScene().getWindow());
+
+        alert.showAndWait().ifPresent(type -> {
+            if (type == allBtn) {
+                exportBarcodesPDF(masterData);
+            }
+            if (type == selectedBtn) {
+                List<Item> selected = itemTable.getSelectionModel().getSelectedItems();
+                if (selected.isEmpty()) {
+                    showAlert("Warning", "No Items Selected", "Select at least one item.");
+                    return;
+                }
+                exportBarcodesPDF(selected);
+            }
+        });
     }
 
 //    private void loadLoggedUserInfo() {

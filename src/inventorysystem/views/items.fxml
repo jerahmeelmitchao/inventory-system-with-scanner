@@ -54,13 +54,8 @@
                 <Button fx:id="deleteButton" onAction="#handleDelete" styleClass="danger-btn" text="Delete Item" />
 
                 <!-- Export button WITH icon (same button structure) -->
-                <Button fx:id="exportButton" onAction="#handleExport" styleClass="secondary-btn" text=" 📥 Export">
-<!--                    <graphic>
-                        <ImageView fitHeight="16" fitWidth="16"
-                                   preserveRatio="true"
-                                   image="@/inventorysystem/assets/dl.png" />
-                    </graphic>-->
-                </Button>
+                <Button fx:id="exportButton" onAction="#handleExport" styleClass="secondary-btn" text=" 📥 Export"/>
+                 <Button fx:id="exportBarcodeButton" onAction="#handleExportBarcode" styleClass="secondary-btn" text="🏷️ Export Barcode" />
             </HBox>
 
 
