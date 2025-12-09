@@ -63,4 +63,11 @@ public class BorrowRecordsPopupController {
         colReturnDate.setCellValueFactory(data -> data.getValue().returnDateProperty());
         colStatus.setCellValueFactory(data -> data.getValue().statusProperty());
     }
+
+    @FXML
+    private void closePopup() {
+        Stage stage = (Stage) recordsTable.getScene().getWindow();
+        stage.close();
+    }
+
 }

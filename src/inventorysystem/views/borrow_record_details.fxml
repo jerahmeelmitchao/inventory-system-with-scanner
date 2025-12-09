@@ -1,80 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="inventorysystem.controllers.BorrowRecordDetailsController"
-            prefWidth="520" prefHeight="420"
-            style="-fx-background-color: white;">
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="inventorysystem.controllers.BorrowRecordDetailsController"
+      spacing="15"
+      style="-fx-padding: 22; -fx-background-color: #ffffff; -fx-background-radius: 12;">
 
-    <!-- TOP TITLE -->
-    <top>
-        <VBox>
-            <padding>
-                <Insets top="20" right="20" bottom="10" left="20"/>
-            </padding>
+    <!-- TITLE -->
+    <Label text="Borrow Record Details"
+           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
 
-            <Label text="Borrow Record Details"
-                   style="-fx-font-size: 22px; -fx-font-weight: bold;" />
-        </VBox>
-    </top>
+    <!-- SUBTEXT -->
+    <Label text="Review full details of this borrowing record"
+           style="-fx-font-size: 13px; -fx-text-fill: #7f8c8d;" />
 
-    <!-- CENTER CONTENT -->
-    <center>
-        <GridPane hgap="15" vgap="15">
+    <!-- GRID CONTENT -->
+    <GridPane hgap="15" vgap="12">
+        <columnConstraints>
+            <ColumnConstraints minWidth="130" halignment="RIGHT"/>
+            <ColumnConstraints hgrow="ALWAYS"/>
+        </columnConstraints>
 
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
+        <!-- Record ID -->
+        <Label text="Record ID:" style="-fx-font-size: 14px; -fx-text-fill: #34495e;"
+               GridPane.rowIndex="0"/>
+        <Label fx:id="lblRecordId" style="-fx-font-size: 14px;"
+               GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-            <columnConstraints>
-                <ColumnConstraints minWidth="130" halignment="RIGHT" />
-                <ColumnConstraints hgrow="ALWAYS" />
-            </columnConstraints>
+        <!-- Item -->
+        <Label text="Item:" style="-fx-font-size: 14px; -fx-text-fill: #34495e;"
+               GridPane.rowIndex="1"/>
+        <Label fx:id="lblItemName" style="-fx-font-size: 14px;"
+               GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-            <Label text="Record ID:" GridPane.rowIndex="0"/>
-            <Label fx:id="lblRecordId" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <!-- Borrower -->
+        <Label text="Borrower:" style="-fx-font-size: 14px; -fx-text-fill: #34495e;"
+               GridPane.rowIndex="2"/>
+        <Label fx:id="lblBorrowerName" style="-fx-font-size: 14px;"
+               GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-            <Label text="Item:" GridPane.rowIndex="1"/>
-            <Label fx:id="lblItemName" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <!-- Borrow Date -->
+        <Label text="Borrow Date:" style="-fx-font-size: 14px; -fx-text-fill: #34495e;"
+               GridPane.rowIndex="3"/>
+        <Label fx:id="lblBorrowDate" style="-fx-font-size: 14px;"
+               GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-            <Label text="Borrower:" GridPane.rowIndex="2"/>
-            <Label fx:id="lblBorrowerName" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        <!-- Return Date -->
+        <Label text="Return Date:" style="-fx-font-size: 14px; -fx-text-fill: #34495e;"
+               GridPane.rowIndex="4"/>
+        <Label fx:id="lblReturnDate" style="-fx-font-size: 14px;"
+               GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-            <Label text="Borrow Date:" GridPane.rowIndex="3"/>
-            <Label fx:id="lblBorrowDate" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <!-- Status -->
+        <Label text="Status:" style="-fx-font-size: 14px; -fx-text-fill: #34495e;"
+               GridPane.rowIndex="5"/>
+        <Label fx:id="lblStatus" style="-fx-font-size: 14px; -fx-font-weight: bold;"
+               GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-            <Label text="Return Date:" GridPane.rowIndex="4"/>
-            <Label fx:id="lblReturnDate" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+        <!-- Remarks -->
+        <Label text="Remarks:" style="-fx-font-size: 14px; -fx-text-fill: #34495e;"
+               GridPane.rowIndex="6"/>
+        <TextArea fx:id="txtRemarks"
+                  GridPane.rowIndex="6"
+                  GridPane.columnIndex="1"
+                  wrapText="true"
+                  editable="false"
+                  prefRowCount="3"
+                  style="-fx-font-size: 14px; -fx-background-radius: 8; -fx-border-radius: 8;
+                         -fx-border-color: #d0d7de;" />
+    </GridPane>
 
-            <Label text="Status:" GridPane.rowIndex="5"/>
-            <Label fx:id="lblStatus" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+    <!-- BUTTONS -->
+    <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
 
-            <Label text="Remarks:" GridPane.rowIndex="6"/>
-            <TextArea fx:id="txtRemarks"
-                      GridPane.rowIndex="6"
-                      GridPane.columnIndex="1"
-                      prefRowCount="3"
-                      wrapText="true"
-                      editable="false"
-                      style="-fx-font-size: 14px;" />
-        </GridPane>
-    </center>
+        <Button fx:id="btnClose"
+                text="Close"
+                style="-fx-background-color: #bdc3c7; -fx-text-fill: #2c3e50;
+                       -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20;" />
+    </HBox>
 
-    <!-- BOTTOM BUTTON -->
-    <bottom>
-        <HBox alignment="CENTER_RIGHT">
-            <padding>
-                <Insets top="10" right="20" bottom="20" left="20"/>
-            </padding>
-
-            <Button fx:id="btnClose"
-                    text="Close"
-                    style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 6 14;" />
-        </HBox>
-    </bottom>
-
-</BorderPane>
+</VBox>
