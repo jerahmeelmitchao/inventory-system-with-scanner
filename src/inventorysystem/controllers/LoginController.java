@@ -1,9 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.UserDAO;
 import inventorysystem.models.User;
 import java.io.IOException;
@@ -29,11 +26,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-/**
- * FXML Controller class
- *
- * @author jaret
- */
 public class LoginController implements Initializable {
 
     @FXML
@@ -45,9 +37,10 @@ public class LoginController implements Initializable {
     @FXML
     private Text signInBtn;
 
-    /**
-     * Initializes the controller class.
-     */
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Press ENTER in password field → login

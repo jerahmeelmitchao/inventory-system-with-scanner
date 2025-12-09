@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.models.Item;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -18,6 +19,10 @@ public class ScanResultController {
     private Item currentItem;
     @FXML
     private Button borrowItemBtn;
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     public void setItem(Item item) {
         this.currentItem = item;

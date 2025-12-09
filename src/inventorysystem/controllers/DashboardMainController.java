@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.ItemDAO;
 import inventorysystem.dao.BorrowerDAO;
 import inventorysystem.dao.BorrowRecordDAO;
@@ -73,6 +74,10 @@ public class DashboardMainController {
     private final ItemDAO itemDAO = new ItemDAO();
     private final BorrowerDAO borrowerDAO = new BorrowerDAO();
     private final BorrowRecordDAO borrowRecordDAO = new BorrowRecordDAO();
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     @FXML
     private StackPane notifBell;

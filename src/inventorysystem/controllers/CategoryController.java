@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.CategoryDAO;
 import inventorysystem.models.Category;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -30,9 +31,24 @@ public class CategoryController {
     private TableColumn<Category, Integer> colCategoryId;
     @FXML
     private TableColumn<Category, String> colCategoryName;
+    @FXML
+    private Button btnPrev, btnNext;
+    @FXML
+    private Label lblPageInfo;
+    @FXML
+    private ComboBox<Integer> rowsPerPageCombo;
 
+    private int currentPage = 1;
+    private int rowsPerPage = 10;
+
+    private ObservableList<Category> masterList = FXCollections.observableArrayList();
+    private ObservableList<Category> pageList = FXCollections.observableArrayList();
     private final CategoryDAO categoryDAO = new CategoryDAO();
     private ObservableList<Category> categoryList;
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     @FXML
     public void initialize() {
@@ -66,11 +82,14 @@ public class CategoryController {
                 e.consume();
             }
         });
+        setupPagination();
     }
 
     private void loadCategories() {
         categoryList = FXCollections.observableArrayList(categoryDAO.getAllCategories());
         categoryTable.setItems(categoryList);
+        masterList.setAll(categoryList);
+        updatePage();
     }
 
     private void populateFields(Category category) {
@@ -165,4 +184,59 @@ public class CategoryController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    private void setupPagination() {
+        rowsPerPageCombo.setItems(FXCollections.observableArrayList(5, 10, 20, 30, 50));
+        rowsPerPageCombo.setValue(10);
+
+        rowsPerPageCombo.valueProperty().addListener((obs, old, newVal) -> {
+            rowsPerPage = newVal;
+            currentPage = 1;
+            updatePage();
+        });
+
+        btnPrev.setOnAction(e -> {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePage();
+            }
+        });
+
+        btnNext.setOnAction(e -> {
+            if (currentPage < getTotalPages()) {
+                currentPage++;
+                updatePage();
+            }
+        });
+    }
+
+    private void updatePage() {
+        int total = masterList.size();
+        int totalPages = getTotalPages();
+        if (totalPages == 0) {
+            totalPages = 1;
+        }
+
+        int from = (currentPage - 1) * rowsPerPage;
+        int to = Math.min(from + rowsPerPage, total);
+
+        if (from > to) {
+            currentPage = 1;
+            from = 0;
+            to = Math.min(rowsPerPage, total);
+        }
+
+        pageList.setAll(masterList.subList(from, to));
+        categoryTable.setItems(pageList);
+
+        lblPageInfo.setText("Page " + currentPage + " of " + totalPages);
+
+        btnPrev.setDisable(currentPage == 1);
+        btnNext.setDisable(currentPage == totalPages);
+    }
+
+    private int getTotalPages() {
+        return (int) Math.ceil((double) masterList.size() / rowsPerPage);
+    }
+
 }

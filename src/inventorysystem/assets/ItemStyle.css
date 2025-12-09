@@ -1,0 +1,77 @@
+/* Background */
+.root-bg {
+    -fx-background-color: #f0f2f5;
+
+    -fx-min-width: 680;
+    -fx-min-height: 900;
+
+    -fx-pref-width: 680;
+    -fx-pref-height: 900;
+
+    -fx-max-width: 1200;
+    -fx-max-height: 900;
+}
+
+/* ScrollPane transparent */
+.scroll-pane {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+/* Card */
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-padding: 32 28;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 20, 0, 0, 4);
+}
+
+/* Title */
+.title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #222;
+}
+
+/* Modern input fields */
+.input {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #d0d4dc;
+    -fx-border-width: 1;
+    -fx-padding: 10;
+    -fx-font-size: 14px;
+    -fx-pref-height: 44;
+}
+
+.input:focused {
+    -fx-border-color: #4a90e2;
+    -fx-border-width: 1.5;
+}
+
+/* Buttons */
+.btn-primary {
+    -fx-background-color: #4a90e2;
+    -fx-text-fill: white;
+    -fx-padding: 10 22;
+    -fx-background-radius: 10;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #327bd8;
+}
+
+.btn-secondary {
+    -fx-background-color: #e4e6eb;
+    -fx-text-fill: #333;
+    -fx-padding: 10 22;
+    -fx-background-radius: 10;
+    -fx-font-size: 14px;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #d8dadf;
+}

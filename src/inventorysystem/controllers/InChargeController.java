@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.CategoryDAO;
 import inventorysystem.dao.InchargeDAO;
 import inventorysystem.models.Incharge;
@@ -43,6 +44,10 @@ public class InChargeController {
     private ObservableList<Incharge> inchargeList;
 
     private Map<Integer, String> categoryMap;  // id -> name
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     @FXML
     public void initialize() {

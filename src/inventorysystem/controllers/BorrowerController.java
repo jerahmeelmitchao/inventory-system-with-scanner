@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.BorrowerDAO;
 import inventorysystem.dao.BorrowRecordDAO;
 import inventorysystem.dao.ItemDAO;
@@ -68,6 +69,10 @@ public class BorrowerController {
 
     private ObservableList<Borrower> borrowerList;
     private Borrower selectedBorrower;
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     // -----------------------------------------
     // INITIALIZE

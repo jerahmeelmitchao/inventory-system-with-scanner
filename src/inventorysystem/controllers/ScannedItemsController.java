@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.utils.DatabaseConnection;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -33,11 +34,16 @@ public class ScannedItemsController {
     private final ObservableList<ScannedItem> scannedList = FXCollections.observableArrayList();
     private final DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
 
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
+
     @FXML
     public void initialize() {
 
         colItemName.setCellValueFactory(data -> data.getValue().itemNameProperty());
 
+        // Format scan date to human readable
         colScanDate.setCellValueFactory(data -> {
             String raw = data.getValue().getScanDate();
             String formatted = raw;
@@ -52,6 +58,9 @@ public class ScannedItemsController {
         });
 
         tableScannedItems.setItems(scannedList);
+
+        // 🔥 Load all scanned items when page opens
+        loadAllScannedItems();
     }
 
     @FXML
@@ -71,7 +80,7 @@ public class ScannedItemsController {
         scannedList.clear();
 
         String sql = """
-            SELECT i.item_name, s.scan_date
+            SELECT s.item_id, i.item_name, s.scan_date
             FROM scan_log s
             JOIN items i ON s.item_id = i.item_id
             WHERE DATE(s.scan_date) BETWEEN ? AND ?
@@ -86,6 +95,33 @@ public class ScannedItemsController {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 scannedList.add(new ScannedItem(
+                        rs.getInt("item_id"),
+                        rs.getString("item_name"),
+                        rs.getString("scan_date")
+                ));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadAllScannedItems() {
+        scannedList.clear();
+
+        String sql = """
+            SELECT s.item_id, i.item_name, s.scan_date
+            FROM scan_log s
+            JOIN items i ON s.item_id = i.item_id
+            ORDER BY s.scan_date DESC
+        """;
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                scannedList.add(new ScannedItem(
+                        rs.getInt("item_id"),
                         rs.getString("item_name"),
                         rs.getString("scan_date")
                 ));
@@ -107,12 +143,10 @@ public class ScannedItemsController {
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/inventorysystem/views/item_details.fxml"));
-
-            // FIX: Use Parent, not AnchorPane
             Parent root = loader.load();
 
             ItemDetailsController controller = loader.getController();
-            controller.loadItem(selected.getItemName());
+            controller.loadItem(selected.getItemId());
 
             Stage stage = new Stage();
             stage.setTitle("Item Details");
@@ -126,27 +160,35 @@ public class ScannedItemsController {
         }
     }
 
-    // Data model for the table
+    // ===============================
+    // UI Table Row Model
+    // ===============================
     public static class ScannedItem {
 
+        private final int itemId;
         private final SimpleStringProperty itemName;
         private final SimpleStringProperty scanDate;
 
-        public ScannedItem(String itemName, String scanDate) {
+        public ScannedItem(int itemId, String itemName, String scanDate) {
+            this.itemId = itemId;
             this.itemName = new SimpleStringProperty(itemName);
             this.scanDate = new SimpleStringProperty(scanDate);
+        }
+
+        public int getItemId() {
+            return itemId;
         }
 
         public String getItemName() {
             return itemName.get();
         }
 
-        public SimpleStringProperty itemNameProperty() {
-            return itemName;
-        }
-
         public String getScanDate() {
             return scanDate.get();
+        }
+
+        public SimpleStringProperty itemNameProperty() {
+            return itemName;
         }
 
         public SimpleStringProperty scanDateProperty() {

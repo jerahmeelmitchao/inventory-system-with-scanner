@@ -1,5 +1,6 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.utils.DatabaseConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -7,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
+import java.security.SecureRandom;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -14,22 +16,38 @@ import java.util.Map;
 
 public class AddItemController {
 
-    @FXML private TextField itemNameField;
-    @FXML private TextField barcodeField;
-    @FXML private ComboBox<String> categoryComboBox;
-    @FXML private TextField unitField;
-    @FXML private DatePicker dateAcquiredPicker;
-    @FXML private ComboBox<String> statusComboBox;  // NEW
-    @FXML private TextField locationField;
-    @FXML private ComboBox<String> inChargeComboBox;
-    @FXML private TextField addedByField;
+    @FXML
+    private TextField itemNameField;
+    @FXML
+    private ComboBox<String> categoryComboBox;
+    @FXML
+    private TextField unitField;
+    @FXML
+    private DatePicker dateAcquiredPicker;
+    @FXML
+    private ComboBox<String> statusComboBox;
+    @FXML
+    private TextField locationField;
+    @FXML
+    private ComboBox<String> inChargeComboBox;
 
-    @FXML private Button saveButton;
-    @FXML private Button cancelButton;
+    @FXML
+    private TextArea descriptionField;   // <-- NEW
+
+    @FXML
+    private TextField addedByField; // auto username
+    @FXML
+    private Button cancelButton;
 
     private final ObservableList<String> categories = FXCollections.observableArrayList();
     private final ObservableList<String> inCharges = FXCollections.observableArrayList();
     private final Map<String, Integer> inChargeMap = new HashMap<>();
+
+    private static final SecureRandom RANDOM = new SecureRandom();
+
+    private void logAction(String action, String details) {
+        AuditLogDAO.log(ItemController.getLoggedUsername(), action, details);
+    }
 
     @FXML
     public void initialize() {
@@ -38,14 +56,18 @@ public class AddItemController {
         setupDropdownOptions();
 
         dateAcquiredPicker.setValue(LocalDate.now());
+
+        // auto-fill username only
+        String username = ItemController.getLoggedUsername();
+        addedByField.setText(username);
+        addedByField.setEditable(false);
+        addedByField.setStyle("-fx-opacity: 0.8;");
     }
 
-    /** Load category names */
     private void loadCategories() {
         String sql = "SELECT category_name FROM categories ORDER BY category_name ASC";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+
+        try (Connection conn = DatabaseConnection.getConnection(); Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
                 categories.add(rs.getString("category_name"));
@@ -53,25 +75,21 @@ public class AddItemController {
             categoryComboBox.setItems(categories);
 
         } catch (SQLException e) {
-            showError("Database Error", "Unable to load categories.", e.getMessage());
+            showError("Error", "Failed to load categories.", e.getMessage());
         }
     }
 
-    /** Load In-Charge list */
     private void loadInChargeList() {
         String sql = "SELECT incharge_id, incharge_name FROM incharge ORDER BY incharge_name ASC";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             inCharges.clear();
             inChargeMap.clear();
 
             while (rs.next()) {
-                int id = rs.getInt("incharge_id");
                 String name = rs.getString("incharge_name");
-
+                int id = rs.getInt("incharge_id");
                 inCharges.add(name);
                 inChargeMap.put(name, id);
             }
@@ -79,138 +97,164 @@ public class AddItemController {
             inChargeComboBox.setItems(inCharges);
 
         } catch (SQLException e) {
-            showError("Database Error", "Unable to load In-Charge list.", e.getMessage());
+            showError("Error", "Failed to load in-charge.", e.getMessage());
         }
     }
 
-    /** Lookup */
     private Integer getInChargeId(String name) {
         return name == null ? null : inChargeMap.get(name);
     }
 
-    /** NEW enum dropdown */
     private void setupDropdownOptions() {
         statusComboBox.setItems(FXCollections.observableArrayList(
                 "Available", "Damaged", "Borrowed", "Missing", "Disposed"
         ));
     }
 
-    /** Save item */
+    // BARCODE GENERATOR
+    private String generateBarcode() {
+        String code = Long.toHexString(RANDOM.nextLong()).toUpperCase();
+        while (code.length() < 12) {
+            code = "0" + code;
+        }
+        return code.substring(0, 12);
+    }
+
+    private boolean barcodeExists(String code) {
+        String sql = "SELECT 1 FROM items WHERE barcode = ? LIMIT 1";
+
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, code);
+            return ps.executeQuery().next();
+        } catch (SQLException e) {
+            return true; // fail safe
+        }
+    }
+
+    private String generateUniqueBarcode() {
+        String code;
+        do {
+            code = generateBarcode();
+        } while (barcodeExists(code));
+        return code;
+    }
+
+    // SAVE
     @FXML
     private void handleSave() {
-        if (!validateInputs()) return;
+        if (!validateInputs()) {
+            return;
+        }
 
-        String itemName = itemNameField.getText().trim();
-        String barcode = barcodeField.getText().trim();
+        String name = itemNameField.getText().trim();
         String category = categoryComboBox.getValue();
         String unit = unitField.getText().trim();
         LocalDate dateAcquired = dateAcquiredPicker.getValue();
         String status = statusComboBox.getValue();
         String location = locationField.getText().trim();
         String inCharge = inChargeComboBox.getValue();
+        String description = descriptionField.getText().trim();
         String addedBy = addedByField.getText().trim();
 
         Integer categoryId = getCategoryId(category);
         Integer inChargeId = getInChargeId(inCharge);
 
         if (categoryId == null || inChargeId == null) {
-            showError("Missing Data", "Category or In-Charge not found.", null);
+            showError("Error", "Category or in-charge not valid.", null);
             return;
         }
 
+        saveNewItem(name, categoryId, unit, dateAcquired, status, location, inChargeId, addedBy, description);
+        
+    }
+
+    private Integer getCategoryId(String name) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(
+                "SELECT category_id FROM categories WHERE category_name=?")) {
+
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+            return rs.next() ? rs.getInt(1) : null;
+
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    private void saveNewItem(String name, int categoryId, String unit, LocalDate dateAcquired,
+            String status, String location, int inChargeId,
+            String addedBy, String description) {
+
+        String barcode = generateUniqueBarcode();
+
         String sql = """
             INSERT INTO items (
-                item_name, barcode, category_id, unit, date_acquired,
-                status, storage_location, incharge_id, added_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                item_name, barcode, category_id, unit, description,
+                date_acquired, status, storage_location, incharge_id, added_by
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, itemName);
+            ps.setString(1, name);
             ps.setString(2, barcode);
             ps.setInt(3, categoryId);
             ps.setString(4, unit);
-            ps.setDate(5, Date.valueOf(dateAcquired));
-            ps.setString(6, status);
-            ps.setString(7, location);
-            ps.setInt(8, inChargeId);
-            ps.setString(9, addedBy);
+            ps.setString(5, description);
+            ps.setDate(6, Date.valueOf(dateAcquired));
+            ps.setString(7, status);
+            ps.setString(8, location);
+            ps.setInt(9, inChargeId);
+            ps.setString(10, addedBy);
 
-            if (ps.executeUpdate() > 0) {
-                showInfo("Success", "Item successfully added!");
-                clearForm();
-            }
+            ps.executeUpdate();
+
+            showInfo("Success", "Item added successfully!\nGenerated Barcode: " + barcode);
+            AuditLogDAO.log(addedBy, "ADD_ITEM", "Added item: " + name);
+            clearForm();
 
         } catch (SQLException e) {
-            showError("Database Error", "Failed to insert item.", e.getMessage());
+            showError("Error", "Failed to add item.", e.getMessage());
         }
     }
 
     @FXML
     private void handleCancel() {
-        Stage stage = (Stage) cancelButton.getScene().getWindow();
-        stage.close();
+        Stage st = (Stage) cancelButton.getScene().getWindow();
+        st.close();
     }
 
-    /** Lookup */
-    private Integer getCategoryId(String categoryName) {
-        String sql = "SELECT category_id FROM categories WHERE category_name = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, categoryName);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) return rs.getInt("category_id");
-
-        } catch (SQLException ignored) {}
-        return null;
-    }
-
-    /** Validation */
     private boolean validateInputs() {
-        if (itemNameField.getText().isEmpty()
-                || barcodeField.getText().isEmpty()
+        return !(itemNameField.getText().isEmpty()
                 || categoryComboBox.getValue() == null
                 || unitField.getText().isEmpty()
                 || dateAcquiredPicker.getValue() == null
                 || statusComboBox.getValue() == null
-                || inChargeComboBox.getValue() == null
-                || locationField.getText().isEmpty()) {
-
-            showError("Missing Fields", "Please complete all required fields.", null);
-            return false;
-        }
-        return true;
-    }
-
-    private void showError(String title, String header, String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(msg);
-        alert.showAndWait();
-    }
-
-    private void showInfo(String title, String msg) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.showAndWait();
+                || locationField.getText().isEmpty()
+                || inChargeComboBox.getValue() == null);
     }
 
     private void clearForm() {
         itemNameField.clear();
-        barcodeField.clear();
         categoryComboBox.getSelectionModel().clearSelection();
         unitField.clear();
         statusComboBox.getSelectionModel().clearSelection();
         dateAcquiredPicker.setValue(LocalDate.now());
         locationField.clear();
         inChargeComboBox.getSelectionModel().clearSelection();
-        addedByField.clear();
+        descriptionField.clear();  // <-- clear description too
+    }
+
+    private void showError(String title, String header, String msg) {
+        Alert a = new Alert(Alert.AlertType.ERROR, msg);
+        a.setTitle(title);
+        a.setHeaderText(header);
+        a.show();
+    }
+
+    private void showInfo(String title, String msg) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION, msg);
+        a.setTitle(title);
+        a.show();
     }
 }

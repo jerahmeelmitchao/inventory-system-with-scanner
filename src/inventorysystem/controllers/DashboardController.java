@@ -1,7 +1,9 @@
 package inventorysystem.controllers;
 
+import inventorysystem.dao.AuditLogDAO;
 import inventorysystem.dao.ItemDAO;
 import inventorysystem.models.Item;
+import inventorysystem.models.ScanLogModel;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -129,6 +131,7 @@ public class DashboardController {
         Item item = dao.getItemByBarcode(barcode);
 
         if (item != null) {
+            ScanLogModel.logScan(item.getItemId());
             showScanPopup(item);
         } else {
             System.out.println("Item not found. Barcode: " + barcode);
