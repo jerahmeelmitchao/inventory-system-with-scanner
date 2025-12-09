@@ -12,10 +12,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -78,8 +80,8 @@ public class DashboardController {
 
     private void loadView(Button clickedButton) {
         // Highlight active button
-        buttonFxmlMap.keySet().forEach(btn ->
-                btn.setStyle(btn == clickedButton
+        buttonFxmlMap.keySet().forEach(btn
+                -> btn.setStyle(btn == clickedButton
                         ? "-fx-background-color: #2980b9;"
                         : "-fx-background-color: #34495e;")
         );
@@ -155,28 +157,78 @@ public class DashboardController {
     }
 
     private void handleLogout() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Logout Confirmation");
-        alert.setHeaderText("Are you sure you want to logout?");
-        alert.setContentText("You will be returned to the login screen.");
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initStyle(javafx.stage.StageStyle.UNDECORATED);
+        popup.setAlwaysOnTop(true);
 
-        if (alert.showAndWait().get() == ButtonType.OK) {
+        VBox root = new VBox(12);
+        root.setAlignment(Pos.CENTER);
+        root.setStyle(
+                "-fx-background-color: white;"
+                + "-fx-padding: 22;"
+                + "-fx-border-color: #dcdcdc;"
+                + "-fx-border-width: 1;"
+                + "-fx-background-radius: 12;"
+                + "-fx-border-radius: 12;"
+                + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.20), 12, 0, 0, 3);"
+        );
+
+        Label icon = new Label("⎋");
+        icon.setStyle("-fx-font-size: 40px; -fx-text-fill: #e74c3c;");
+
+        Label title = new Label("Logout?");
+        title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        Label msg = new Label("You will be returned to the login screen.");
+        msg.setStyle("-fx-font-size: 13px; -fx-text-fill: #7f8c8d;");
+
+        HBox buttons = new HBox(10);
+        buttons.setAlignment(Pos.CENTER);
+
+        Button btnCancel = new Button("Cancel");
+        btnCancel.setStyle(
+                "-fx-background-color: #bdc3c7; -fx-text-fill: white;"
+                + "-fx-background-radius: 6;"
+                + "-fx-padding: 6 22;"
+        );
+        btnCancel.setOnAction(e -> popup.close());
+
+        Button btnLogout = new Button("Logout");
+        btnLogout.setStyle(
+                "-fx-background-color: #e74c3c; -fx-text-fill: white;"
+                + "-fx-background-radius: 6;"
+                + "-fx-padding: 6 22;"
+                + "-fx-font-weight: bold;"
+        );
+
+        btnLogout.setOnAction(e -> {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/inventorysystem/views/login.fxml"));
-                Parent root = loader.load();
+                Parent rootLogin = loader.load();
 
                 Stage stage = (Stage) logoutBtn.getScene().getWindow();
-                Scene scene = new Scene(root, 800, 500);
-                scene.getStylesheets().add(getClass()
-                        .getResource("/inventorysystem/assets/styles.css")
-                        .toExternalForm());
+                Scene scene = new Scene(rootLogin, 800, 500);
+
+                scene.getStylesheets().add(
+                        getClass().getResource("/inventorysystem/assets/styles.css").toExternalForm()
+                );
 
                 stage.setScene(scene);
                 stage.centerOnScreen();
 
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
-        }
+            popup.close();
+        });
+
+        buttons.getChildren().addAll(btnCancel, btnLogout);
+        root.getChildren().addAll(icon, title, msg, buttons);
+
+        Scene scene = new Scene(root, 300, 210);
+        popup.setScene(scene);
+        popup.showAndWait();
     }
+
 }

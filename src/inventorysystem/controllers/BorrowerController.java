@@ -129,7 +129,6 @@ public class BorrowerController {
 //        filterTypeCombo.setValue("All");
 
 //        filterPositionCombo.setValue("All");
-
         searchField.textProperty().addListener((a, b, c) -> applyFilters());
         filterTypeCombo.valueProperty().addListener((a, b, c) -> applyFilters());
         filterPositionCombo.valueProperty().addListener((a, b, c) -> applyFilters());
@@ -197,46 +196,89 @@ public class BorrowerController {
     }
 
     @FXML
-    private void handleDelete() {
-        if (selectedBorrower == null) {
-            showAlert("Error", "Select a borrower first.");
-            return;
-        }
-
-        // ---- CONFIRMATION DIALOG ----
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirm Delete");
-        confirm.setHeaderText("Delete Borrower");
-        confirm.setContentText(
-                "Are you sure you want to delete:\n\n"
-                + selectedBorrower.getBorrowerName() + "\n(" + selectedBorrower.getPosition() + ")\n\n"
-                + "This action cannot be undone."
-        );
-
-        ButtonType yesBtn = new ButtonType("Yes, Delete");
-        ButtonType noBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        confirm.getButtonTypes().setAll(yesBtn, noBtn);
-
-        // Show dialog in front of current window
-        confirm.initOwner(borrowerTable.getScene().getWindow());
-
-        confirm.showAndWait().ifPresent(response -> {
-
-            if (response == yesBtn) {
-
-                // perform delete
-                if (borrowerDAO.deleteBorrower(selectedBorrower.getBorrowerId())) {
-
-                    borrowerList.remove(selectedBorrower);
-                    populatePositionFilter();
-                    handleCancel();
-
-                    showAlert("Success", "Borrower deleted successfully.");
-                }
-            }
-        });
+private void handleDelete() {
+    if (selectedBorrower == null) {
+        showAlert("Error", "Select a borrower first.");
+        return;
     }
+
+    // Custom popup (NO X BUTTON)
+    Stage popup = new Stage();
+    popup.initStyle(javafx.stage.StageStyle.UNDECORATED);
+    popup.initModality(Modality.APPLICATION_MODAL);
+    popup.setAlwaysOnTop(true);
+
+    // === ROOT CARD ===
+    VBox root = new VBox(15);
+    root.setAlignment(Pos.CENTER);
+    root.setStyle(
+            "-fx-background-color: white; "
+            + "-fx-padding: 20; "
+            + "-fx-background-radius: 12; "
+            + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 15, 0, 0, 3);"
+    );
+
+    // === TITLE ===
+    Label title = new Label("Delete Borrower");
+    title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+    // === MESSAGE ===
+    Label msg = new Label(
+            "Are you sure you want to delete:\n"
+            + selectedBorrower.getBorrowerName()
+            + "\n(" + selectedBorrower.getPosition() + ")"
+            + "\n\nThis action cannot be undone."
+    );
+    msg.setStyle("-fx-font-size: 14px; -fx-text-fill: #555;");
+    msg.setAlignment(Pos.CENTER);
+    msg.setWrapText(true);
+
+    // === BUTTONS ===
+    Button btnCancel = new Button("Cancel");
+    btnCancel.setStyle(
+            "-fx-background-color: #bdc3c7; "
+            + "-fx-text-fill: white; "
+            + "-fx-background-radius: 8; "
+            + "-fx-padding: 6 18;"
+    );
+    btnCancel.setOnAction(e -> popup.close());
+
+    Button btnDelete = new Button("Delete");
+    btnDelete.setStyle(
+            "-fx-background-color: #e74c3c; "
+            + "-fx-text-fill: white; "
+            + "-fx-background-radius: 8; "
+            + "-fx-padding: 6 18;"
+    );
+    btnDelete.setOnAction(e -> {
+        if (borrowerDAO.deleteBorrower(selectedBorrower.getBorrowerId())) {
+            borrowerList.remove(selectedBorrower);
+            populatePositionFilter();
+            handleCancel();
+            showAlert("Success", "Borrower deleted successfully.");
+        }
+        popup.close();
+    });
+
+    HBox buttons = new HBox(10, btnCancel, btnDelete);
+    buttons.setAlignment(Pos.CENTER_RIGHT);
+
+    // === ADD TO ROOT ===
+    root.getChildren().addAll(title, msg, buttons);
+
+    // === SCENE ===
+    Scene scene = new Scene(root, 350, 220);
+    popup.setScene(scene);
+
+    // === FADE IN (matches your update popup animation) ===
+    FadeTransition ft = new FadeTransition(Duration.millis(180), root);
+    root.setOpacity(0);
+    ft.setToValue(1);
+    ft.play();
+
+    popup.showAndWait();
+}
+
 
     @FXML
     private void handleCancel() {
@@ -283,10 +325,28 @@ public class BorrowerController {
     // -----------------------------------------
     private void openBorrowPanel(Borrower borrower) {
         Dialog<Void> dialog = new Dialog<>();
+        dialog.initStyle(javafx.stage.StageStyle.UNDECORATED); // ❌ remove X
+
         dialog.setTitle("Borrow Item");
+
+        // ---- STYLING ----
+        dialog.getDialogPane().setStyle(
+                "-fx-background-color: #ffffff; "
+                + "-fx-padding: 20; "
+                + "-fx-border-color: #d0d0d0; "
+                + "-fx-border-radius: 10; "
+                + "-fx-background-radius: 10;"
+        );
+
+        Label title = new Label("Select an Item to Borrow");
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
         TextField search = new TextField();
         search.setPromptText("Search item...");
+        search.setStyle(
+                "-fx-background-radius: 6; -fx-padding: 8; "
+                + "-fx-border-radius: 6; -fx-border-color: #bdc3c7;"
+        );
 
         ListView<Item> listView = new ListView<>();
         ObservableList<Item> items = FXCollections.observableArrayList(itemDAO.getAllItems());
@@ -296,27 +356,79 @@ public class BorrowerController {
             @Override
             protected void updateItem(Item item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty || item == null ? null
-                        : item.getItemName() + " (" + item.getStatus() + ")");
+
+                if (empty || item == null) {
+                    setText(null);
+                    return;
+                }
+
+                // Color-coded status
+                String color = switch (item.getStatus()) {
+                    case "Available" ->
+                        "#27ae60";    // green
+                    case "Borrowed" ->
+                        "#e67e22";     // orange
+                    case "Missing" ->
+                        "#c0392b";      // red
+                    default ->
+                        "#7f8c8d";             // gray
+                };
+
+                setText(item.getItemName() + "  •  " + item.getStatus());
+                setStyle("-fx-font-size: 14px; -fx-text-fill: #2c3e50;");
             }
         });
 
         // Search filter
-        search.textProperty().addListener((obs, old, val) -> {
-            listView.setItems(items.filtered(i
-                    -> i.getItemName().toLowerCase().contains(val.toLowerCase())));
-        });
+        search.textProperty().addListener((obs, old, val)
+                -> listView.setItems(items.filtered(i
+                        -> i.getItemName().toLowerCase().contains(val.toLowerCase())))
+        );
 
-        VBox content = new VBox(10, search, listView);
+        Label warningLabel = new Label("");
+        warningLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-size: 12px;");
+
+        VBox content = new VBox(12, title, search, listView, warningLabel);
+        content.setStyle("-fx-padding: 10;");
         dialog.getDialogPane().setContent(content);
 
-        ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        // ---- BUTTONS ----
+        ButtonType saveBtn = new ButtonType("Borrow", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
+
+        Button saveButtonNode = (Button) dialog.getDialogPane().lookupButton(saveBtn);
+
+        // Default disabled
+        saveButtonNode.setDisable(true);
+        saveButtonNode.setStyle("-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 5;");
+
+        // Enable/Disable based on item status
+        listView.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+            if (newSel == null) {
+                saveButtonNode.setDisable(true);
+                warningLabel.setText("");
+                return;
+            }
+
+            String status = newSel.getStatus();
+
+            if (status.equalsIgnoreCase("Borrowed")
+                    || status.equalsIgnoreCase("Missing")) {
+
+                saveButtonNode.setDisable(true);
+                saveButtonNode.setStyle("-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-background-radius: 5;");
+                warningLabel.setText("⚠ This item is not available for borrowing.");
+            } else {
+                saveButtonNode.setDisable(false);
+                saveButtonNode.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5;");
+                warningLabel.setText("");
+            }
+        });
 
         dialog.setResultConverter(bt -> {
             if (bt == saveBtn) {
                 Item item = listView.getSelectionModel().getSelectedItem();
-                if (item != null && item.getStatus().equals("Available")) {
+                if (item != null) {
 
                     itemDAO.updateItemStatus(item.getItemId(), "Borrowed");
 
@@ -329,7 +441,6 @@ public class BorrowerController {
                             "Borrowed",
                             ""
                     );
-                    borrowRecordDAO.addBorrowRecord(record);
 
                     borrowRecordDAO.addBorrowRecord(record);
 
@@ -344,41 +455,99 @@ public class BorrowerController {
 
     private void openReturnPanel(Borrower borrower) {
         Dialog<Void> dialog = new Dialog<>();
+        dialog.initStyle(javafx.stage.StageStyle.UNDECORATED);
+
         dialog.setTitle("Return Item");
 
+        // Compact Panel Styling
+        dialog.getDialogPane().setPrefWidth(380);
+        dialog.getDialogPane().setStyle(
+                "-fx-background-color: #ffffff; "
+                + "-fx-padding: 15; "
+                + "-fx-border-color: #d0d0d0; "
+                + "-fx-border-radius: 10; "
+                + "-fx-background-radius: 10;"
+        );
+
+        Label title = new Label("Return Borrowed Item");
+        title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        // Get active borrowed items
         List<BorrowRecord> active = borrowRecordDAO
                 .getBorrowRecordsByBorrower(borrower.getBorrowerId())
-                .stream().filter(r -> r.getStatus().equals("Borrowed")).toList();
+                .stream()
+                .filter(r -> r.getStatus().equals("Borrowed"))
+                .toList();
 
+        // Compact ListView
         ListView<BorrowRecord> listView = new ListView<>(FXCollections.observableArrayList(active));
+        listView.setPrefHeight(150); // smaller height
 
+        // Styled compact list cells
         listView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(BorrowRecord r, boolean empty) {
                 super.updateItem(r, empty);
-                setText(empty || r == null ? null
-                        : "Item ID: " + r.getItemId() + " | Borrowed: " + r.getBorrowDate());
+
+                if (empty || r == null) {
+                    setText(null);
+                    return;
+                }
+
+                Item item = itemDAO.getItemById(r.getItemId());
+                String itemName = item != null ? item.getItemName() : "Unknown Item";
+
+                setText(itemName + "\nBorrowed: " + r.getBorrowDate().toString().replace("T", " "));
+                setStyle("-fx-font-size: 13px; -fx-padding: 4; -fx-text-fill: #2c3e50;");
             }
         });
 
+        Label remarksLabel = new Label("Remarks:");
+        remarksLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #34495e;");
+
         TextArea remarks = new TextArea();
         remarks.setPromptText("Remarks...");
+        remarks.setPrefHeight(60); // smaller
+        remarks.setStyle(
+                "-fx-background-radius: 6; -fx-padding: 6; "
+                + "-fx-border-radius: 6; -fx-border-color: #bdc3c7; -fx-font-size: 12px;"
+        );
 
-        VBox content = new VBox(10, listView, new Label("Remarks:"), remarks);
+        Label warningLabel = new Label("");
+        warningLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-size: 11px;");
+
+        if (active.isEmpty()) {
+            warningLabel.setText("⚠ No borrowed items to return.");
+        }
+
+        VBox content = new VBox(10, title, listView, remarksLabel, remarks, warningLabel);
+        content.setStyle("-fx-padding: 5;");
         dialog.getDialogPane().setContent(content);
 
         ButtonType saveBtn = new ButtonType("Return", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 
+        Button saveButtonNode = (Button) dialog.getDialogPane().lookupButton(saveBtn);
+
+        // Disable until selection
+        saveButtonNode.setDisable(active.isEmpty());
+        saveButtonNode.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5;");
+
+        listView.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+            saveButtonNode.setDisable(newSel == null);
+        });
+
         dialog.setResultConverter(bt -> {
             if (bt == saveBtn) {
+
                 BorrowRecord rec = listView.getSelectionModel().getSelectedItem();
                 if (rec != null) {
 
                     borrowRecordDAO.returnBorrowRecord(rec.getRecordId(), LocalDateTime.now(), remarks.getText());
 
                     String newStatus = remarks.getText().toLowerCase().contains("damaged")
-                            ? "Damaged" : "Available";
+                            ? "Damaged"
+                            : "Available";
 
                     itemDAO.updateItemStatus(rec.getItemId(), newStatus);
 
@@ -539,6 +708,7 @@ public class BorrowerController {
             });
 
             Stage stage = new Stage();
+            stage.initStyle(javafx.stage.StageStyle.UNDECORATED); // ❌ removes X button
             stage.setTitle(isEdit ? "Edit Borrower" : "Add Borrower");
             stage.setScene(new Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL);

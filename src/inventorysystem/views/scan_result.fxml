@@ -43,7 +43,7 @@
             <Label text="Description:"
                    style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #34495e;" />
             <Label fx:id="description" wrapText="true"
-                   style="-fx-font-size: 14px; -fx-text-fill: #4b4b4b;" />
+                   style="-fx-font-size: 14px; -fx-text-fill: #black;" />
         </VBox>
 
         <!-- STATUS TAG -->
@@ -56,7 +56,7 @@
                        -fx-font-size: 13px;
                        -fx-background-radius: 12;
                        -fx-padding: 4 12;
-                       -fx-text-fill: white;
+                       -fx-text-fill: black;
                    " />
         </HBox>
     </VBox>

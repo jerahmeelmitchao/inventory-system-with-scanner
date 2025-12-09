@@ -26,12 +26,25 @@ public class ScanResultController {
         description.setText(item.getDescription());
         status.setText(item.getStatus());
 
-        // 🔥 Disable Borrow Item button if already borrowed
-        if ("Borrowed".equalsIgnoreCase(item.getStatus())) {
+        String stat = item.getStatus() == null ? "" : item.getStatus().trim();
+
+        // 🔥 Disable button for items that cannot be borrowed
+        if (stat.equalsIgnoreCase("Borrowed")) {
+
             borrowItemBtn.setDisable(true);
             borrowItemBtn.setText("Already Borrowed");
+
+        } else if (stat.equalsIgnoreCase("Missing")
+                || stat.equalsIgnoreCase("Damaged")
+                || stat.equalsIgnoreCase("Disposed")) {
+
+            borrowItemBtn.setDisable(true);
+            borrowItemBtn.setText("Unavailable");
+
         } else {
+            // ✔ Available for borrowing
             borrowItemBtn.setDisable(false);
+            borrowItemBtn.setText("Borrow Item");
         }
     }
 

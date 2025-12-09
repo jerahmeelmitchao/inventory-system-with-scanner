@@ -7,38 +7,37 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;   // <-- REQUIRED
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
         try {
-            // Load the FXML file
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource("/inventorysystem/views/dashboard.fxml"));
-
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource("/inventorysystem/views/login.fxml"));
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/inventorysystem/views/login.fxml"));
+            // Load Login Window
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/inventorysystem/views/login.fxml")
+            );
             Parent root = loader.load();
-            // Create scene with fixed size
-            
-            // Scene size for dashboard 
-//            Scene scene = new Scene(root, 1200, 750);
-            
-            // Scene size for login 
-            Scene scene = new Scene(root, 800, 500);
-            scene.getStylesheets().add(getClass().getResource("/inventorysystem/assets/styles.css").toExternalForm());
 
-            // Stage setup
+            Scene scene = new Scene(root, 800, 500);
+            scene.getStylesheets().add(
+                    getClass().getResource("/inventorysystem/assets/styles.css").toExternalForm()
+            );
+
+            // REMOVE DEFAULT WINDOW FRAME (X, minimize, maximize)
+            primaryStage.initStyle(StageStyle.UNDECORATED);
+
             primaryStage.setTitle("Inventory Management System");
-            // ✅ Add app icon here
+
+            // App Icon
             primaryStage.getIcons().add(
                     new Image(getClass().getResourceAsStream("/inventorysystem/assets/app_icon.png"))
             );
+
             primaryStage.setScene(scene);
-
-            // Disable resizing to make it fixed
             primaryStage.setResizable(false);
-
+            primaryStage.centerOnScreen();
             primaryStage.show();
 
         } catch (IOException e) {
