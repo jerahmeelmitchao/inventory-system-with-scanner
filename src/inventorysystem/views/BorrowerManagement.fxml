@@ -4,49 +4,101 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
-<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="inventorysystem.controllers.BorrowerController"
-      spacing="12">
+      spacing="15"
+      style="-fx-padding: 20;
+             -fx-background-color: #ffffff;
+             -fx-background-radius: 10;
+             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 16, 0.1, 0, 3);">
 
-    <padding>
-        <Insets top="10" right="10" bottom="10" left="10"/>
-    </padding>
+    <!-- 🟦 TITLE -->
+    <Label text="Borrower Management"
+           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
 
-    <!-- 🔍 SEARCH + FILTER BAR -->
-    <HBox spacing="10" alignment="CENTER_LEFT">
+    <!-- 🔍 SEARCH + FILTERS -->
+    <HBox spacing="12" alignment="CENTER_LEFT">
 
         <TextField fx:id="searchField"
                    promptText="Search borrower..."
-                   HBox.hgrow="ALWAYS"/>
-
-        <ComboBox fx:id="filterTypeCombo"
-                  promptText="Filter Type"
-                  prefWidth="140"/>
+                   HBox.hgrow="ALWAYS"
+                   style="-fx-background-radius: 8;
+                          -fx-padding: 8;
+                          -fx-background-color: #f4f6f7;
+                          -fx-border-color: #dcdcdc;
+                          -fx-border-radius: 8;" />
 
         <ComboBox fx:id="filterPositionCombo"
-                  promptText="Filter Position"
-                  prefWidth="160"/>
+                  promptText="Position"
+                  prefWidth="140"
+                  style="-fx-background-radius: 8;
+                         -fx-padding: 6;
+                         -fx-background-color: #f4f6f7;
+                         -fx-border-color: #dcdcdc;
+                         -fx-border-radius: 8;" />
+        
+        <ComboBox fx:id="filterTypeCombo"
+                    promptText="Type"
+                    prefWidth="130"
+                    style="-fx-background-radius: 8;
+                         -fx-padding: 6;
+                         -fx-background-color: #f4f6f7;
+                         -fx-border-color: #dcdcdc;
+                         -fx-border-radius: 8;" />
 
         <Button fx:id="clearFilterButton"
-                text="Clear Filters"
+                text="Clear"
                 onAction="#handleClearFilters"
-                style="-fx-background-color: #d9534f; -fx-text-fill: white;"/>
-    </HBox>
-    <!-- ACTION BUTTONS -->
-    <HBox spacing="10">
-        <Button fx:id="addButton" text="Add" onAction="#handleAdd"/>
-        <Button fx:id="updateButton" text="Update" onAction="#handleUpdate" disable="true"/>
-        <Button fx:id="deleteButton" text="Delete" onAction="#handleDelete" disable="true"/>
-        <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel" visible="false"/>
+                style="-fx-background-color: #e74c3c; 
+                       -fx-text-fill: white;
+                       -fx-font-weight: bold;
+                       -fx-background-radius: 8;
+                       -fx-padding: 8 14;" />
     </HBox>
 
-    <!-- TABLE -->
+    <!-- ➕ ACTION BUTTONS -->
+    <HBox spacing="10">
+
+        <Button fx:id="addButton"
+                text="Add Borrower"
+                onAction="#handleAdd"
+                style="-fx-background-color: #3498db; -fx-text-fill: white;
+                       -fx-font-weight: bold; -fx-background-radius: 8;
+                       -fx-padding: 8 18;" />
+
+        <Button fx:id="updateButton"
+                text="Update"
+                onAction="#handleUpdate"
+                disable="true"
+                style="-fx-background-color: #27ae60; -fx-text-fill: #2c3e50;
+                       -fx-font-weight: bold; -fx-background-radius: 8;
+                       -fx-padding: 8 18;" />
+
+        <Button fx:id="deleteButton"
+                text="Delete"
+                onAction="#handleDelete"
+                disable="true"
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white;
+                       -fx-font-weight: bold; -fx-background-radius: 8;
+                       -fx-padding: 8 18;" />
+
+        <Button fx:id="cancelButton"
+                text="Cancel Selection"
+                onAction="#handleCancel"
+                visible="false"
+                style="-fx-background-color: #bdc3c7; -fx-text-fill: #2c3e50;
+                       -fx-font-weight: bold; -fx-background-radius: 8;
+                       -fx-padding: 8 18;" />
+    </HBox>
+
+    <!-- TABLE (untouched as requested) -->
     <TableView fx:id="borrowerTable" prefHeight="350">
         <columns>
-            <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
-            <TableColumn fx:id="colName" text="Name" prefWidth="150"/>
+            <TableColumn fx:id="colId" text="ID" prefWidth="60"/>
+            <TableColumn fx:id="colName" text="Name" prefWidth="180"/>
             <TableColumn fx:id="colPosition" text="Position" prefWidth="150"/>
-            <TableColumn fx:id="colType" text="Type" prefWidth="100"/>
+            <TableColumn fx:id="colType" text="Type" prefWidth="120"/>
             <TableColumn fx:id="colActions" text="Actions" prefWidth="200"/>
         </columns>
     </TableView>
