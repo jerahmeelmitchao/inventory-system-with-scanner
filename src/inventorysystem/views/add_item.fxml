@@ -44,9 +44,9 @@
                                     promptText="Date acquired"
                                     styleClass="input"/>
 
-                        <TextField fx:id="locationField"
-                                   promptText="Storage location"
-                                   styleClass="input"/>
+                        <ComboBox fx:id="locationComboBox"
+                                  promptText="Storage location"
+                                  styleClass="input"/>
 
                         <ComboBox fx:id="inChargeComboBox"
                                   promptText="Person in charge"

@@ -70,7 +70,7 @@ public class ItemDetailsController {
         lblStatus.setText(nullSafe(item.getStatus()));
         lblAddedBy.setText(nullSafe(item.getAddedBy()));
         lblInCharge.setText(nullSafe(item.getInChargeName()));
-        lblLocation.setText(nullSafe(item.getStorageLocation()));
+        lblLocation.setText(nullSafe(item.getLocationName()));
 
         // Description
         txtDescription.setText(nullSafe(item.getDescription()));

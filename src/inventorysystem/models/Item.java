@@ -16,7 +16,8 @@ public class Item {
     private LocalDate dateAcquired;
 
     private String status;
-    private String storageLocation;
+    private Integer locationId;
+    private String locationName; // joined display only
 
     private int inchargeId;
 
@@ -31,7 +32,7 @@ public class Item {
 
     private String description;
 
-    public Item(int itemId, String itemName, String itemCode, int categoryId, String unit, LocalDate dateAcquired, String status, String storageLocation, int inchargeId, String inChargeName, String categoryName, String addedBy, LocalDateTime lastScanned, String description) {
+    public Item(int itemId, String itemName, String itemCode, int categoryId, String unit, LocalDate dateAcquired, String status, int locationId, int inchargeId, String inChargeName, String categoryName, String addedBy, LocalDateTime lastScanned, String description) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.itemCode = itemCode;
@@ -39,7 +40,7 @@ public class Item {
         this.unit = unit;
         this.dateAcquired = dateAcquired;
         this.status = status;
-        this.storageLocation = storageLocation;
+        this.locationId = locationId;
         this.inchargeId = inchargeId;
         this.inChargeName = inChargeName;
         this.categoryName = categoryName;
@@ -49,13 +50,12 @@ public class Item {
     }
 
     // Required empty constructor
-    public Item() {}
-    
-    
+    public Item() {
+    }
 
     public Item(int itemId, String itemName, String itemCode, int categoryId,
-                String unit, LocalDate dateAcquired, String status,
-                String storageLocation, int inchargeId, String addedBy) {
+            String unit, LocalDate dateAcquired, String status,
+            int locationId, int inchargeId, String addedBy) {
 
         this.itemId = itemId;
         this.itemName = itemName;
@@ -64,7 +64,7 @@ public class Item {
         this.unit = unit;
         this.dateAcquired = dateAcquired;
         this.status = status;
-        this.storageLocation = storageLocation;
+        this.locationId = locationId;
         this.inchargeId = inchargeId;
         this.addedBy = addedBy;
     }
@@ -72,47 +72,127 @@ public class Item {
     // -------------------------------
     // Getters / Setters
     // -------------------------------
+    public int getItemId() {
+        return itemId;
+    }
 
-    public int getItemId() { return itemId; }
-    public void setItemId(int itemId) { this.itemId = itemId; }
+    public void setItemId(int itemId) {
+        this.itemId = itemId;
+    }
 
-    public String getItemName() { return itemName; }
-    public void setItemName(String itemName) { this.itemName = itemName; }
+    public String getItemName() {
+        return itemName;
+    }
 
-    public String getItemCode() { return itemCode; }        // FIXED
-    public void setItemCode(String itemCode) { this.itemCode = itemCode; }
-    public String getBarcode() { return itemCode; }     
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
 
-    public int getCategoryId() { return categoryId; }
-    public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
+    public String getItemCode() {
+        return itemCode;
+    }        // FIXED
 
-    public String getUnit() { return unit; }
-    public void setUnit(String unit) { this.unit = unit; }
+    public void setItemCode(String itemCode) {
+        this.itemCode = itemCode;
+    }
 
-    public LocalDate getDateAcquired() { return dateAcquired; }
-    public void setDateAcquired(LocalDate dateAcquired) { this.dateAcquired = dateAcquired; }
+    public String getBarcode() {
+        return itemCode;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public int getCategoryId() {
+        return categoryId;
+    }
 
-    public String getStorageLocation() { return storageLocation; }
-    public void setStorageLocation(String storageLocation) { this.storageLocation = storageLocation; }
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
 
-    public int getInchargeId() { return inchargeId; }
-    public void setInchargeId(int inchargeId) { this.inchargeId = inchargeId; }
+    public String getUnit() {
+        return unit;
+    }
 
-    public String getInChargeName() { return inChargeName; }
-    public void setInChargeName(String inChargeName) { this.inChargeName = inChargeName; }
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 
-    public String getCategoryName() { return categoryName; }
-    public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
+    public LocalDate getDateAcquired() {
+        return dateAcquired;
+    }
 
-    public String getAddedBy() { return addedBy; }
-    public void setAddedBy(String addedBy) { this.addedBy = addedBy; }
+    public void setDateAcquired(LocalDate dateAcquired) {
+        this.dateAcquired = dateAcquired;
+    }
 
-    public LocalDateTime getLastScanned() { return lastScanned; }    // FIXED for DATETIME
-    public void setLastScanned(LocalDateTime lastScanned) { this.lastScanned = lastScanned; }
+    public String getStatus() {
+        return status;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Integer getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(Integer locationId) {
+        this.locationId = locationId;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+
+    public int getInchargeId() {
+        return inchargeId;
+    }
+
+    public void setInchargeId(int inchargeId) {
+        this.inchargeId = inchargeId;
+    }
+
+    public String getInChargeName() {
+        return inChargeName;
+    }
+
+    public void setInChargeName(String inChargeName) {
+        this.inChargeName = inChargeName;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getAddedBy() {
+        return addedBy;
+    }
+
+    public void setAddedBy(String addedBy) {
+        this.addedBy = addedBy;
+    }
+
+    public LocalDateTime getLastScanned() {
+        return lastScanned;
+    }    // FIXED for DATETIME
+
+    public void setLastScanned(LocalDateTime lastScanned) {
+        this.lastScanned = lastScanned;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

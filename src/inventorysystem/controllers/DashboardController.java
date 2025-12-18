@@ -34,6 +34,9 @@ public class DashboardController {
     @FXML
     private Button categoriesBtn;
     @FXML
+    private Button locationsBtn;
+
+    @FXML
     private Button borrowersBtn;
     @FXML
     private Button inchargesBtn;
@@ -56,6 +59,7 @@ public class DashboardController {
         buttonFxmlMap.put(dashboardBtn, "dashboard2.fxml");
         buttonFxmlMap.put(itemsBtn, "items.fxml");
         buttonFxmlMap.put(categoriesBtn, "category.fxml");
+        buttonFxmlMap.put(locationsBtn, "location.fxml");
         buttonFxmlMap.put(borrowersBtn, "BorrowerManagement.fxml");
         buttonFxmlMap.put(inchargesBtn, "InCharge.fxml");
         buttonFxmlMap.put(scannedItemsBtn, "scanned_items.fxml");

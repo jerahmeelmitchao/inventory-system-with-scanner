@@ -100,7 +100,7 @@ public class ReportsController {
                         safe(it.getStatus()),
                         safe(dateAcq),
                         safe(lastScanned),
-                        safe(it.getStorageLocation()),
+                        safe(it.getLocationName()),
                         safe(it.getInChargeName()),
                         safe(it.getAddedBy())
                 ));
@@ -182,7 +182,7 @@ public class ReportsController {
                             safe(it.getBarcode()),
                             safe(it.getCategoryName()),
                             safe(lastScanned),
-                            safe(it.getStorageLocation()),
+                            safe(it.getLocationName()),
                             safe(it.getInChargeName())
                     ));
                 }
@@ -217,7 +217,7 @@ public class ReportsController {
                             safe(it.getBarcode()),
                             safe(it.getCategoryName()),
                             safe(dateAcq),
-                            safe(it.getStorageLocation()),
+                            safe(it.getLocationName()),
                             safe(it.getInChargeName()),
                             "" // remarks column reserved if you store it elsewhere
                     ));

@@ -273,7 +273,7 @@ public class ItemController {
                     safe(item.getBarcode()),
                     safe(item.getCategoryName()),
                     safe(item.getStatus()),
-                    safe(item.getStorageLocation()),
+                    safe(item.getLocationName()),
                     safe(item.getInChargeName()),
                     safe(item.getAddedBy())
             ).toLowerCase();
@@ -921,7 +921,7 @@ public class ItemController {
                         csvSafe(it.getStatus()),
                         csvSafe(it.getDateAcquired() != null ? it.getDateAcquired().toString() : ""),
                         csvSafe(it.getLastScanned() != null ? it.getLastScanned().toString() : ""),
-                        csvSafe(it.getStorageLocation()),
+                        csvSafe(it.getLocationName()),
                         csvSafe(it.getInChargeName())
                 ));
             }
@@ -951,7 +951,7 @@ public class ItemController {
                         csvSafe(it.getCategoryName()),
                         csvSafe(it.getUnit()),
                         csvSafe(it.getStatus()),
-                        csvSafe(it.getStorageLocation()),
+                        csvSafe(it.getLocationName()),
                         csvSafe(it.getInChargeName())
                 ));
             }
@@ -980,7 +980,7 @@ public class ItemController {
                             csvSafe(it.getItemName()),
                             csvSafe(it.getBarcode()),
                             csvSafe(it.getCategoryName()),
-                            csvSafe(it.getStorageLocation()),
+                            csvSafe(it.getLocationName()),
                             csvSafe(it.getInChargeName())
                     ));
                 }
