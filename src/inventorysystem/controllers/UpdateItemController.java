@@ -19,7 +19,9 @@ public class UpdateItemController {
     @FXML
     private ComboBox<String> categoryComboBox;
     @FXML
-    private TextField unitField;
+    private ComboBox<String> unitComboBox;
+
+    private final Map<String, Integer> unitMap = new HashMap<>();
     @FXML
     private ComboBox<String> statusComboBox;
     @FXML
@@ -47,6 +49,7 @@ public class UpdateItemController {
         loadCategories();
         loadInChargeList();
         loadLocations(); // ✅
+        loadUnits();
 
         statusComboBox.setItems(FXCollections.observableArrayList(
                 "Available", "Damaged", "Borrowed", "Missing", "Disposed"
@@ -76,18 +79,19 @@ public class UpdateItemController {
         editingId = itemId;
 
         String sql = """
-        SELECT 
-            i.*,
-            c.category_name,
-            ic.incharge_name,
-            l.location_name
-        FROM items i
-        LEFT JOIN categories c ON i.category_id = c.category_id
-        LEFT JOIN incharge ic ON i.incharge_id = ic.incharge_id
-        LEFT JOIN locations l ON i.location_id = l.location_id
-        WHERE i.item_id = ?
-    """;
-
+            SELECT 
+                i.*,
+                c.category_name,
+                ic.incharge_name,
+                l.location_name,
+                u.unit_name
+            FROM items i
+            LEFT JOIN categories c ON i.category_id = c.category_id
+            LEFT JOIN incharge ic ON i.incharge_id = ic.incharge_id
+            LEFT JOIN locations l ON i.location_id = l.location_id
+            LEFT JOIN units u ON i.unit_id = u.unit_id
+            WHERE i.item_id = ?
+        """;
         try (Connection c = DatabaseConnection.getConnection(); PreparedStatement p = c.prepareStatement(sql)) {
 
             p.setInt(1, itemId);
@@ -96,7 +100,7 @@ public class UpdateItemController {
             if (r.next()) {
                 itemNameField.setText(r.getString("item_name"));
                 barcodeField.setText(r.getString("barcode"));
-                unitField.setText(r.getString("unit"));
+                unitComboBox.setValue(r.getString("unit_name"));
                 categoryComboBox.setValue(r.getString("category_name"));
                 statusComboBox.setValue(r.getString("status"));
 
@@ -124,7 +128,7 @@ public class UpdateItemController {
             UPDATE items SET
                 item_name=?,
                 category_id=?,
-                unit=?,
+                unit_id=?,
                 date_acquired=?,
                 status=?,
                 location_id=?,
@@ -135,7 +139,7 @@ public class UpdateItemController {
 
             p.setString(1, itemNameField.getText());
             p.setInt(2, getCategoryId(categoryComboBox.getValue()));
-            p.setString(3, unitField.getText());
+            p.setInt(3, unitMap.get(unitComboBox.getValue()));
             p.setDate(4, Date.valueOf(dateAcquiredPicker.getValue()));
             p.setString(5, statusComboBox.getValue());
 
@@ -205,4 +209,23 @@ public class UpdateItemController {
         closeWindow();
     }
 
+    private void loadUnits() {
+        String sql = "SELECT unit_id, unit_name FROM units ORDER BY unit_name";
+
+        try (Connection c = DatabaseConnection.getConnection(); PreparedStatement p = c.prepareStatement(sql); ResultSet r = p.executeQuery()) {
+
+            unitComboBox.getItems().clear();
+            unitMap.clear();
+
+            while (r.next()) {
+                String name = r.getString("unit_name");
+                int id = r.getInt("unit_id");
+
+                unitComboBox.getItems().add(name);
+                unitMap.put(name, id);
+            }
+        } catch (SQLException e) {
+            showAlert("Error", "Failed to load units", e.getMessage());
+        }
+    }
 }

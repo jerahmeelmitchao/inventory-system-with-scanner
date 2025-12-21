@@ -37,9 +37,9 @@
                                   promptText="Select category"
                                   styleClass="input"/>
 
-                        <TextField fx:id="unitField"
-                                   promptText="Unit (pcs, sets)"
-                                   styleClass="input"/>
+                        <ComboBox fx:id="unitComboBox"
+                                  promptText="Select unit"
+                                  styleClass="input"/>
 
                         <ComboBox fx:id="statusComboBox"
                                   promptText="Status"

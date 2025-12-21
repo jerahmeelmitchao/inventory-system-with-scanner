@@ -33,6 +33,7 @@
             <Button fx:id="categoriesBtn" text="Categories" prefWidth="160" styleClass="sidebar-btn"/>
             <!-- ✅ NEW -->
             <Button fx:id="locationsBtn" text="Locations" prefWidth="160" styleClass="sidebar-btn"/>
+            <Button fx:id="unitsBtn" text="Units" prefWidth="160" styleClass="sidebar-btn"/>
             <Button fx:id="borrowersBtn" text="Borrowers" prefWidth="160" styleClass="sidebar-btn"/>
             <Button fx:id="borrowRecordsBtn" text="Borrow Records" prefWidth="160" styleClass="sidebar-btn"/>
             <Button fx:id="inchargesBtn" text="Incharge" prefWidth="160" styleClass="sidebar-btn"/>

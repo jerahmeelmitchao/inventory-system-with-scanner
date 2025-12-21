@@ -15,18 +15,20 @@ public class ItemDAO {
     public boolean addItem(Item item) {
 
         String sql = """
-            INSERT INTO items
-            (item_name, barcode, category_id, unit, date_acquired,
-             status, location_id, incharge_id, added_by, description)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
+        INSERT INTO items
+        (item_name, barcode, category_id, unit_id, date_acquired,
+         status, location_id, incharge_id, added_by, description)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """;
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, item.getItemName());
             stmt.setString(2, item.getItemCode());
             stmt.setInt(3, item.getCategoryId());
-            stmt.setString(4, item.getUnit());
+
+            // ✅ FIXED UNIT
+            stmt.setObject(4, item.getUnitId(), Types.INTEGER);
 
             if (item.getDateAcquired() != null) {
                 stmt.setDate(5, Date.valueOf(item.getDateAcquired()));
@@ -98,14 +100,17 @@ public class ItemDAO {
     public Item getItemById(int itemId) {
 
         String sql = """
-            SELECT i.*,
-                   c.category_name,
-                   ic.incharge_name,
-                   l.location_name
+            SELECT 
+                i.*,
+                c.category_name,
+                ic.incharge_name,
+                l.location_name,
+                u.unit_name
             FROM items i
             LEFT JOIN categories c ON i.category_id = c.category_id
             LEFT JOIN incharge ic ON i.incharge_id = ic.incharge_id
             LEFT JOIN locations l ON i.location_id = l.location_id
+            LEFT JOIN units u ON i.unit_id = u.unit_id
             WHERE i.item_id = ?
         """;
 
@@ -133,16 +138,18 @@ public class ItemDAO {
         List<Item> list = new ArrayList<>();
 
         String sql = """
-            SELECT i.*,
-                   c.category_name,
-                   ic.incharge_name,
-                   l.location_name
-            FROM items i
-            LEFT JOIN categories c ON i.category_id = c.category_id
-            LEFT JOIN incharge ic ON i.incharge_id = ic.incharge_id
-            LEFT JOIN locations l ON i.location_id = l.location_id
-            ORDER BY i.item_name ASC
-        """;
+        SELECT i.*,
+               c.category_name,
+               ic.incharge_name,
+               l.location_name,
+               u.unit_name
+        FROM items i
+        LEFT JOIN categories c ON i.category_id = c.category_id
+        LEFT JOIN incharge ic ON i.incharge_id = ic.incharge_id
+        LEFT JOIN locations l ON i.location_id = l.location_id
+        LEFT JOIN units u ON i.unit_id = u.unit_id
+        ORDER BY i.item_name ASC
+    """;
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
@@ -163,26 +170,28 @@ public class ItemDAO {
     public void updateItem(Item item) {
 
         String sql = """
-            UPDATE items SET
-                item_name=?,
-                barcode=?,
-                category_id=?,
-                unit=?,
-                date_acquired=?,
-                status=?,
-                location_id=?,
-                incharge_id=?,
-                added_by=?,
-                description=?
-            WHERE item_id=?
-        """;
+        UPDATE items SET
+            item_name=?,
+            barcode=?,
+            category_id=?,
+            unit_id=?,
+            date_acquired=?,
+            status=?,
+            location_id=?,
+            incharge_id=?,
+            added_by=?,
+            description=?
+        WHERE item_id=?
+    """;
 
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, item.getItemName());
             stmt.setString(2, item.getItemCode());
             stmt.setInt(3, item.getCategoryId());
-            stmt.setString(4, item.getUnit());
+
+            // ✅ FIXED UNIT
+            stmt.setObject(4, item.getUnitId(), Types.INTEGER);
 
             if (item.getDateAcquired() != null) {
                 stmt.setDate(5, Date.valueOf(item.getDateAcquired()));
@@ -251,7 +260,11 @@ public class ItemDAO {
         item.setItemName(rs.getString("item_name"));
         item.setItemCode(rs.getString("barcode"));
         item.setCategoryId(rs.getInt("category_id"));
-        item.setUnit(rs.getString("unit"));
+
+        // ✅ FIXED UNIT
+        item.setUnitId((Integer) rs.getObject("unit_id"));
+        item.setUnitName(rs.getString("unit_name"));
+
         item.setStatus(rs.getString("status"));
         item.setLocationId((Integer) rs.getObject("location_id"));
         item.setInchargeId((Integer) rs.getObject("incharge_id"));

@@ -12,7 +12,9 @@ public class Item {
     private String itemCode;
 
     private int categoryId;
-    private String unit;
+    private Integer unitId;
+    private String unitName;
+
     private LocalDate dateAcquired;
 
     private String status;
@@ -32,12 +34,12 @@ public class Item {
 
     private String description;
 
-    public Item(int itemId, String itemName, String itemCode, int categoryId, String unit, LocalDate dateAcquired, String status, int locationId, int inchargeId, String inChargeName, String categoryName, String addedBy, LocalDateTime lastScanned, String description) {
+    public Item(int itemId, String itemName, String itemCode, int categoryId, int unitId, LocalDate dateAcquired, String status, int locationId, int inchargeId, String inChargeName, String categoryName, String addedBy, LocalDateTime lastScanned, String description) {
         this.itemId = itemId;
         this.itemName = itemName;
         this.itemCode = itemCode;
         this.categoryId = categoryId;
-        this.unit = unit;
+        this.unitId = unitId;
         this.dateAcquired = dateAcquired;
         this.status = status;
         this.locationId = locationId;
@@ -54,14 +56,14 @@ public class Item {
     }
 
     public Item(int itemId, String itemName, String itemCode, int categoryId,
-            String unit, LocalDate dateAcquired, String status,
-            int locationId, int inchargeId, String addedBy) {
+            Integer unitId, LocalDate dateAcquired, String status,
+            Integer locationId, int inchargeId, String addedBy) {
 
         this.itemId = itemId;
         this.itemName = itemName;
         this.itemCode = itemCode;
         this.categoryId = categoryId;
-        this.unit = unit;
+        this.unitId = unitId;
         this.dateAcquired = dateAcquired;
         this.status = status;
         this.locationId = locationId;
@@ -108,12 +110,20 @@ public class Item {
         this.categoryId = categoryId;
     }
 
-    public String getUnit() {
-        return unit;
+    public Integer getUnitId() {
+        return unitId;
     }
 
-    public void setUnit(String unit) {
-        this.unit = unit;
+    public void setUnitId(Integer unitId) {
+        this.unitId = unitId;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
     }
 
     public LocalDate getDateAcquired() {

@@ -20,7 +20,9 @@ public class AddItemController {
     @FXML
     private ComboBox<String> categoryComboBox;
     @FXML
-    private TextField unitField;
+    private ComboBox<String> unitComboBox;
+    private final Map<String, Integer> unitMap = new HashMap<>();
+
     @FXML
     private DatePicker dateAcquiredPicker;
     @FXML
@@ -29,7 +31,6 @@ public class AddItemController {
     // ✅ CHANGED
     @FXML
     private ComboBox<String> locationComboBox;
-
     @FXML
     private ComboBox<String> inChargeComboBox;
     @FXML
@@ -48,6 +49,7 @@ public class AddItemController {
     @FXML
     public void initialize() {
         loadCategories();
+        loadUnits();
         loadInChargeList();
         setupDropdownOptions();
         loadLocations(); // ✅ ADD
@@ -113,7 +115,7 @@ public class AddItemController {
         saveNewItem(
                 itemNameField.getText().trim(),
                 getCategoryId(categoryComboBox.getValue()),
-                unitField.getText().trim(),
+                unitMap.get(unitComboBox.getValue()),
                 dateAcquiredPicker.getValue(),
                 statusComboBox.getValue(),
                 locationComboBox.getValue(), // ✅
@@ -123,30 +125,38 @@ public class AddItemController {
         );
     }
 
-    private void saveNewItem(String name, int categoryId, String unit,
-            LocalDate dateAcquired, String status,
-            String location, int inChargeId,
-            String addedBy, String description) {
+    private void saveNewItem(
+            String name,
+            int categoryId,
+            int unitId,
+            LocalDate dateAcquired,
+            String status,
+            String locationName,
+            int inChargeId,
+            String addedBy,
+            String description
+    ) {
 
         String sql = """
-            INSERT INTO items (
-                item_name, barcode, category_id, unit, description,
-                date_acquired, status, storage_location, incharge_id, added_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
+        INSERT INTO items (
+            item_name, barcode, category_id, unit_id,
+            date_acquired, status, location_id,
+            incharge_id, added_by, description
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """;
 
         try (Connection c = DatabaseConnection.getConnection(); PreparedStatement p = c.prepareStatement(sql)) {
 
             p.setString(1, name);
             p.setString(2, generateUniqueBarcode());
             p.setInt(3, categoryId);
-            p.setString(4, unit);
-            p.setString(5, description);
-            p.setDate(6, Date.valueOf(dateAcquired));
-            p.setString(7, status);
-            p.setString(8, location); // ✅
-            p.setInt(9, inChargeId);
-            p.setString(10, addedBy);
+            p.setInt(4, unitId);
+            p.setDate(5, Date.valueOf(dateAcquired));
+            p.setString(6, status);
+            p.setInt(7, getLocationId(locationName));
+            p.setInt(8, inChargeId);
+            p.setString(9, addedBy);
+            p.setString(10, description);
 
             p.executeUpdate();
             showInfo("Success", "Item added successfully!");
@@ -160,7 +170,7 @@ public class AddItemController {
     private boolean validateInputs() {
         return !(itemNameField.getText().isEmpty()
                 || categoryComboBox.getValue() == null
-                || unitField.getText().isEmpty()
+                || unitComboBox.getValue() == null
                 || statusComboBox.getValue() == null
                 || locationComboBox.getValue() == null
                 || inChargeComboBox.getValue() == null);
@@ -193,6 +203,36 @@ public class AddItemController {
     private void handleCancel() {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
+    }
+
+    private void loadUnits() {
+        String sql = "SELECT unit_id, unit_name FROM units ORDER BY unit_name";
+        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                String name = rs.getString("unit_name");
+                int id = rs.getInt("unit_id");
+
+                unitComboBox.getItems().add(name);
+                unitMap.put(name, id);
+            }
+
+        } catch (SQLException e) {
+            showError("Error", "Failed to load units", e.getMessage());
+        }
+    }
+
+    private int getLocationId(String locationName) {
+        String sql = "SELECT location_id FROM locations WHERE location_name=?";
+        try (Connection c = DatabaseConnection.getConnection(); PreparedStatement p = c.prepareStatement(sql)) {
+
+            p.setString(1, locationName);
+            ResultSet r = p.executeQuery();
+            return r.next() ? r.getInt(1) : 0;
+
+        } catch (SQLException e) {
+            return 0;
+        }
     }
 
 }

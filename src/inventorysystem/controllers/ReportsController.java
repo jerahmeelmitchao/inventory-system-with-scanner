@@ -96,7 +96,7 @@ public class ReportsController {
                         safe(it.getItemName()),
                         safe(it.getBarcode()),
                         safe(it.getCategoryName()),
-                        safe(it.getUnit()),
+                        safe(it.getUnitName()),
                         safe(it.getStatus()),
                         safe(dateAcq),
                         safe(lastScanned),

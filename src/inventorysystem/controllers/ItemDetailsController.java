@@ -66,7 +66,7 @@ public class ItemDetailsController {
         lblName.setText(nullSafe(item.getItemName()));
         lblBarcode.setText(nullSafe(item.getBarcode()));
         lblCategory.setText(nullSafe(item.getCategoryName()));
-        lblUnit.setText(nullSafe(item.getUnit()));
+        lblUnit.setText(nullSafe(item.getUnitName()));
         lblStatus.setText(nullSafe(item.getStatus()));
         lblAddedBy.setText(nullSafe(item.getAddedBy()));
         lblInCharge.setText(nullSafe(item.getInChargeName()));

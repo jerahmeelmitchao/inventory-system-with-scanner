@@ -121,8 +121,9 @@ public class ItemController {
     private void setupTableColumns() {
         colItemName.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getItemName()));
         colBarcode.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getBarcode()));
-        colUnit.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getUnit()));
-
+        // ✅ FIXED UNIT
+        colUnit.setCellValueFactory(cd
+                -> new SimpleStringProperty(cd.getValue().getUnitName()));
         colStatus.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getStatus()));
 
         colInCharge.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getInChargeName()));
@@ -917,7 +918,7 @@ public class ItemController {
                         csvSafe(it.getItemName()),
                         csvSafe(it.getBarcode()),
                         csvSafe(it.getCategoryName()),
-                        csvSafe(it.getUnit()),
+                        csvSafe(it.getUnitName()),
                         csvSafe(it.getStatus()),
                         csvSafe(it.getDateAcquired() != null ? it.getDateAcquired().toString() : ""),
                         csvSafe(it.getLastScanned() != null ? it.getLastScanned().toString() : ""),
@@ -949,7 +950,7 @@ public class ItemController {
                         csvSafe(it.getItemName()),
                         csvSafe(it.getBarcode()),
                         csvSafe(it.getCategoryName()),
-                        csvSafe(it.getUnit()),
+                        csvSafe(it.getUnitName()),
                         csvSafe(it.getStatus()),
                         csvSafe(it.getLocationName()),
                         csvSafe(it.getInChargeName())
